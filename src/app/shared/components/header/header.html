@@ -1,1 +1,78 @@
-<p>header works!</p>
+<nav class="bg-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex items-center">
+        <a routerLink="/courses" class="flex-shrink-0 flex items-center">
+          <h1 class="text-xl font-bold text-primary-600">English Learning Platform</h1>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a routerLink="/courses" routerLinkActive="text-primary-600" 
+           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+          Courses
+        </a>
+        <a routerLink="/exams" routerLinkActive="text-primary-600"
+           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+          Exams
+        </a>
+        <a *ngIf="authService.isAdmin()" routerLink="/users/admin" routerLinkActive="text-primary-600"
+           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+          Admin Dashboard
+        </a>
+      </div>
+
+      <!-- User Menu -->
+      <div class="hidden md:flex items-center space-x-4">
+        <span class="text-sm text-gray-600">
+          {{ authService.currentUser()?.firstName }} {{ authService.currentUser()?.lastName }}
+        </span>
+        <button (click)="authService.logout()" 
+                class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+          Logout
+        </button>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden flex items-center">
+        <button (click)="toggleMenu()" 
+                class="text-gray-700 hover:text-primary-600 focus:outline-none focus:text-primary-600">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path *ngIf="!isMenuOpen()" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 6h16M4 12h16M4 18h16" />
+            <path *ngIf="isMenuOpen()" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <div *ngIf="isMenuOpen()" class="md:hidden">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50">
+      <a routerLink="/courses" (click)="closeMenu()"
+         class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">
+        Courses
+      </a>
+      <a routerLink="/exams" (click)="closeMenu()"
+         class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">
+        Exams
+      </a>
+      <a *ngIf="authService.isAdmin()" routerLink="/users/admin" (click)="closeMenu()"
+         class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">
+        Admin Dashboard
+      </a>
+      <div class="border-t border-gray-200 pt-4">
+        <div class="px-3 py-2 text-sm text-gray-600">
+          {{ authService.currentUser()?.firstName }} {{ authService.currentUser()?.lastName }}
+        </div>
+        <button (click)="authService.logout(); closeMenu()" 
+                class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium w-full text-left">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

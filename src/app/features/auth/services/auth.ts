@@ -1,6 +1,6 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { User, LoginRequest, RegisterRequest, AuthResponse } from '../../../core/models/user.model';
+import { User, LoginRequest, RegisterRequest } from '../../../core/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,9 @@ export class AuthService {
   public readonly isLoading = this._isLoading.asReadonly();
   public readonly error = this._error.asReadonly();
 
-  constructor(private router: Router) {
+  private router = inject(Router);
+
+  constructor() {
     // Effect to persist user data
     effect(() => {
       const user = this._currentUser();
@@ -70,7 +72,7 @@ export class AuthService {
         this._error.set('Invalid credentials');
         return false;
       }
-    } catch (error) {
+    } catch {
       this._error.set('Login failed. Please try again.');
       return false;
     } finally {
@@ -98,7 +100,7 @@ export class AuthService {
       
       this._currentUser.set(user);
       return true;
-    } catch (error) {
+    } catch {
       this._error.set('Registration failed. Please try again.');
       return false;
     } finally {
@@ -118,7 +120,7 @@ export class AuthService {
       try {
         const user = JSON.parse(storedUser);
         this._currentUser.set(user);
-      } catch (error) {
+      } catch {
         localStorage.removeItem('currentUser');
       }
     }

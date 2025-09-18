@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 })
 export class LoadingSpinnerComponent {
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
-  @Input() color: string = 'text-primary-600';
+  @Input() color = 'text-primary-600';
 
   get sizeClass(): string {
     switch (this.size) {

@@ -101,7 +101,7 @@ export class ExamsService {
 
     // Calculate score
     let correctAnswers = 0;
-    let totalQuestions = exam.questions.length;
+    const totalQuestions = exam.questions.length;
 
     attempt.answers.forEach(answer => {
       const question = exam.questions.find(q => q.id === answer.questionId);

@@ -5,8 +5,8 @@ import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
   standalone: true
 })
 export class HighlightDirective implements OnInit {
-  @Input() appHighlight: string = 'yellow';
-  @Input() appHighlightOpacity: number = 0.3;
+  @Input() appHighlight = 'yellow';
+  @Input() appHighlightOpacity = 0.3;
 
   constructor(
     private el: ElementRef,
