@@ -1,1 +1,68 @@
-<p>login works!</p>
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        Sign in to your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Or
+        <a routerLink="/register" class="font-medium text-primary-600 hover:text-primary-500">
+          create a new account
+        </a>
+      </p>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <div class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input mt-1"
+            placeholder="Enter your email"
+          />
+          <div *ngIf="getErrorMessage('email')" class="form-error">
+            {{ getErrorMessage('email') }}
+          </div>
+        </div>
+        
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-input mt-1"
+            placeholder="Enter your password"
+          />
+          <div *ngIf="getErrorMessage('password')" class="form-error">
+            {{ getErrorMessage('password') }}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="authService.error()" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+        {{ authService.error() }}
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          [disabled]="!isFormValid()"
+          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <app-loading-spinner *ngIf="isSubmitting()" class="mr-2"></app-loading-spinner>
+          {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
+        </button>
+      </div>
+
+      <div class="text-center text-sm text-gray-600">
+        <p>Demo accounts:</p>
+        <p><strong>Admin:</strong> admin@test.com / admin123</p>
+        <p><strong>User:</strong> user@test.com / user123</p>
+      </div>
+    </form>
+  </div>
+</div>
