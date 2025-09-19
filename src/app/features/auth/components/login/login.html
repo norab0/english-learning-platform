@@ -1,13 +1,16 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8">
     <div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Sign in to your account
+      <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
+        Welcome back!
       </h2>
       <p class="mt-2 text-center text-sm text-gray-600">
-        Or
-        <a routerLink="/register" class="font-medium text-primary-600 hover:text-primary-500">
-          create a new account
+        Sign in to continue your English learning journey
+      </p>
+      <p class="mt-1 text-center text-sm text-gray-500">
+        Don't have an account?
+        <a routerLink="/auth/register" class="font-medium text-blue-600 hover:text-blue-500">
+          Create one here
         </a>
       </p>
     </div>
@@ -51,17 +54,19 @@
         <button
           type="submit"
           [disabled]="!isFormValid()"
-          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="btn-primary w-full flex justify-center py-2 px-4"
         >
           <app-loading-spinner *ngIf="isSubmitting()" class="mr-2"></app-loading-spinner>
           {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
         </button>
       </div>
 
-      <div class="text-center text-sm text-gray-600">
-        <p>Demo accounts:</p>
-        <p><strong>Admin:</strong> admin@test.com / admin123</p>
-        <p><strong>User:</strong> user@test.com / user123</p>
+      <div class="text-center text-sm text-gray-600 bg-blue-50 p-4 rounded-lg">
+        <p class="font-medium text-blue-800 mb-2">Demo accounts for testing:</p>
+        <div class="space-y-1">
+          <p><strong>Admin:</strong> admin@test.com / admin123</p>
+          <p><strong>Student:</strong> user@test.com / user123</p>
+        </div>
       </div>
     </form>
   </div>

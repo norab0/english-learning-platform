@@ -1,1 +1,136 @@
-<p>register works!</p>
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
+        Create your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Or
+        <a routerLink="/auth/login" class="font-medium text-blue-600 hover:text-blue-500">
+          sign in to your existing account
+        </a>
+      </p>
+    </div>
+    
+    <form class="mt-8 space-y-6" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="space-y-4">
+        <!-- First Name -->
+        <div>
+          <label for="firstName" class="block text-sm font-medium text-gray-700">
+            First Name
+          </label>
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            class="form-input"
+            placeholder="Enter your first name"
+          />
+          <div *ngIf="getErrorMessage('firstName')" class="form-error">
+            {{ getErrorMessage('firstName') }}
+          </div>
+        </div>
+
+        <!-- Last Name -->
+        <div>
+          <label for="lastName" class="block text-sm font-medium text-gray-700">
+            Last Name
+          </label>
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            class="form-input"
+            placeholder="Enter your last name"
+          />
+          <div *ngIf="getErrorMessage('lastName')" class="form-error">
+            {{ getErrorMessage('lastName') }}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Email Address
+          </label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            placeholder="Enter your email"
+          />
+          <div *ngIf="getErrorMessage('email')" class="form-error">
+            {{ getErrorMessage('email') }}
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-input"
+            placeholder="Enter your password"
+          />
+          <div *ngIf="getErrorMessage('password')" class="form-error">
+            {{ getErrorMessage('password') }}
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            class="form-input"
+            placeholder="Confirm your password"
+          />
+          <div *ngIf="getErrorMessage('confirmPassword')" class="form-error">
+            {{ getErrorMessage('confirmPassword') }}
+          </div>
+        </div>
+
+        <!-- Role Selection -->
+        <div>
+          <label for="role" class="block text-sm font-medium text-gray-700">
+            Account Type
+          </label>
+          <select
+            id="role"
+            formControlName="role"
+            class="form-input"
+          >
+            <option value="user">Student</option>
+            <option value="admin">Administrator</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="authService.error()" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+        {{ authService.error() }}
+      </div>
+
+      <!-- Submit Button -->
+      <div>
+        <button
+          type="submit"
+          [disabled]="!isFormValid()"
+          class="btn-primary w-full flex justify-center py-2 px-4"
+        >
+          <app-loading-spinner *ngIf="isSubmitting()" class="mr-2"></app-loading-spinner>
+          {{ isSubmitting() ? 'Creating Account...' : 'Create Account' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

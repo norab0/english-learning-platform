@@ -88,16 +88,26 @@ export class AuthService {
       // Simulate API call
       await this.delay(1000);
       
+      // Check if email already exists
+      const existingUsers = this.getStoredUsers();
+      if (existingUsers.some(u => u.email === userData.email)) {
+        this._error.set('Email already exists. Please use a different email.');
+        return false;
+      }
+      
       // Mock registration
       const user: User = {
         id: Date.now().toString(),
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
-        role: 'user',
-        createdAt: new Date()
+        role: userData.role || 'user',
+        createdAt: new Date(),
+        lastLogin: new Date()
       };
       
+      // Store user in localStorage
+      this.storeUser(user);
       this._currentUser.set(user);
       return true;
     } catch {
@@ -111,7 +121,7 @@ export class AuthService {
   logout(): void {
     this._currentUser.set(null);
     this._error.set(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 
   private loadUserFromStorage(): void {
@@ -124,6 +134,17 @@ export class AuthService {
         localStorage.removeItem('currentUser');
       }
     }
+  }
+
+  private getStoredUsers(): User[] {
+    const stored = localStorage.getItem('registeredUsers');
+    return stored ? JSON.parse(stored) : [];
+  }
+
+  private storeUser(user: User): void {
+    const users = this.getStoredUsers();
+    users.push(user);
+    localStorage.setItem('registeredUsers', JSON.stringify(users));
   }
 
   private delay(ms: number): Promise<void> {
