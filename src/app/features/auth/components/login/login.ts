@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-login',
