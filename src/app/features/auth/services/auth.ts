@@ -51,6 +51,7 @@ export class AuthService {
           firstName: 'Admin',
           lastName: 'User',
           role: 'admin',
+          token: this.generateToken(),
           createdAt: new Date(),
           lastLogin: new Date()
         };
@@ -63,6 +64,7 @@ export class AuthService {
           firstName: 'Regular',
           lastName: 'User',
           role: 'user',
+          token: this.generateToken(),
           createdAt: new Date(),
           lastLogin: new Date()
         };
@@ -102,6 +104,7 @@ export class AuthService {
         firstName: userData.firstName,
         lastName: userData.lastName,
         role: userData.role || 'user',
+        token: this.generateToken(),
         createdAt: new Date(),
         lastLogin: new Date()
       };
@@ -149,5 +152,10 @@ export class AuthService {
 
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private generateToken(): string {
+    // Generate a simple mock token
+    return 'mock-token-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
   }
 }

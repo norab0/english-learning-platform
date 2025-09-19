@@ -4,6 +4,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'user' | 'admin';
+  token: string;
   createdAt: Date;
   lastLogin?: Date;
 }
@@ -18,6 +19,7 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
+  role?: 'user' | 'admin';
 }
 
 export interface AuthResponse {
