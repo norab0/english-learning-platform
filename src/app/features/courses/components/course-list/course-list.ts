@@ -5,7 +5,6 @@ import { CoursesService } from '../../services/courses';
 import { AuthService } from '../../../auth/services/auth';
 import { DurationPipe } from '../../../../shared/pipes/duration-pipe';
 import { LevelBadgePipe } from '../../../../shared/pipes/level-badge-pipe';
-import { HighlightDirective } from '../../../../shared/directives/highlight';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner';
 
 @Component({
@@ -16,7 +15,6 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
     RouterModule, 
     DurationPipe, 
     LevelBadgePipe, 
-    HighlightDirective, 
     LoadingSpinnerComponent
   ],
   templateUrl: './course-list.html',

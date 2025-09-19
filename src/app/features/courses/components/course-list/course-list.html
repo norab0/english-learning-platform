@@ -46,7 +46,7 @@
           <select
             id="level"
             [value]="selectedLevel()"
-            (change)="onLevelChange($event.target.value)"
+            (change)="onLevelChange($any($event.target).value)"
             class="form-input"
           >
             <option value="all">All Levels</option>
@@ -72,9 +72,7 @@
     <div *ngIf="!coursesService.isLoading() && !coursesService.error()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div 
         *ngFor="let course of filteredCourses()" 
-        class="card hover:shadow-lg transition-shadow duration-200"
-        appHighlight="rgba(59, 130, 246, 0.1)"
-        appHighlightOpacity="0.1"
+        class="card hover:shadow-lg transition-shadow duration-200 highlight"
       >
         <!-- Course Header -->
         <div class="flex justify-between items-start mb-4">
