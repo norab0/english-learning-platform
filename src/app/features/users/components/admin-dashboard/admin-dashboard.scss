@@ -1,0 +1,105 @@
+/* Admin Dashboard Component Styles */
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Statistics cards */
+.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 > div {
+  transition: all 0.2s ease-in-out;
+}
+
+.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 > div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* User list items */
+.space-y-4 > div {
+  transition: all 0.2s ease-in-out;
+}
+
+.space-y-4 > div:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+/* Role badges */
+.bg-purple-100 {
+  background-color: #f3e8ff;
+}
+
+.bg-green-100 {
+  background-color: #dcfce7;
+}
+
+.bg-purple-800 {
+  color: #6b21a8;
+}
+
+.bg-green-800 {
+  color: #166534;
+}
+
+/* Progress bars */
+.bg-blue-600 {
+  transition: width 0.5s ease-in-out;
+}
+
+/* Score colors */
+.text-green-600 {
+  color: #16a34a;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+/* Button hover effects */
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .grid-cols-1.lg\\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Icon containers */
+.w-8.h-8 {
+  transition: transform 0.2s ease-in-out;
+}
+
+.w-8.h-8:hover {
+  transform: scale(1.1);
+}
+
+/* User avatars */
+.w-10.h-10 {
+  background: linear-gradient(135deg, #6b7280, #9ca3af);
+}
+
+/* Hover effects for interactive elements */
+button:hover {
+  transform: translateY(-1px);
+}
+
+a:hover {
+  text-decoration: underline;
+}

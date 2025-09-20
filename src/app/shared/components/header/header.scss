@@ -1,0 +1,72 @@
+/* Header Component Styles */
+nav {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Navigation links */
+a {
+  transition: all 0.2s ease-in-out;
+}
+
+a:hover {
+  transform: translateY(-1px);
+}
+
+/* User avatar */
+.w-8.h-8 {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  transition: transform 0.2s ease-in-out;
+}
+
+.w-8.h-8:hover {
+  transform: scale(1.1);
+}
+
+/* Mobile menu */
+.md\\:hidden > div {
+  animation: slideDown 0.3s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Active link styling */
+.router-link-active {
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .space-y-1 > * + * {
+    margin-top: 0.25rem;
+  }
+}
+
+/* Focus states for accessibility */
+button:focus,
+a:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
