@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="card mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">{{ exam()?.title }}</h1>
+          <p class="text-gray-600">{{ exam()?.description }}</p>
+        </div>
+        <div class="text-right">
+          <div class="text-2xl font-bold text-red-600" [class.text-red-500]="timeRemaining() < 300">
+            {{ timeFormatted() }}
+          </div>
+          <div class="text-sm text-gray-500">Time Remaining</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="card mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-gray-700">Progress</span>
+        <span class="text-sm text-gray-500">{{ currentQuestionIndex() + 1 }} of {{ totalQuestions() }}</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+             [style.width.%]="progress()"></div>
+      </div>
+    </div>
+
+    <!-- Question -->
+    <div *ngIf="currentQuestion() as question" class="card">
+      <div class="mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">
+          Question {{ currentQuestionIndex() + 1 }}
+        </h2>
+        <p class="text-gray-700 text-lg">{{ question.text }}</p>
+      </div>
+
+      <!-- Answer Options -->
+      <div class="space-y-3">
+        <div *ngFor="let option of question.options; let i = index" 
+             class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer transition-colors"
+             [class.bg-blue-50]="selectedAnswers()[question.id] === i"
+             [class.border-blue-500]="selectedAnswers()[question.id] === i"
+             (click)="selectAnswer(question.id, i)">
+          <input type="radio" 
+                 [id]="'option-' + question.id + '-' + i"
+                 [name]="'question-' + question.id"
+                 [value]="i"
+                 [checked]="selectedAnswers()[question.id] === i"
+                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+          <label [for]="'option-' + question.id + '-' + i" 
+                 class="ml-3 text-gray-700 cursor-pointer flex-1">
+            {{ option }}
+          </label>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="flex justify-between mt-8">
+        <button type="button"
+                (click)="previousQuestion()"
+                [disabled]="currentQuestionIndex() === 0"
+                class="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed">
+          ← Previous
+        </button>
+        
+        <div class="flex space-x-4">
+          <button type="button"
+                  (click)="nextQuestion()"
+                  [disabled]="currentQuestionIndex() === totalQuestions() - 1"
+                  class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+            Next →
+          </button>
+          
+          <button type="button"
+                  (click)="submitExam()"
+                  [disabled]="isSubmitted()"
+                  class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+            Submit Exam
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div *ngIf="isSubmitted()" class="card text-center">
+      <div class="mb-6">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+             [class]="score() >= 70 ? 'bg-green-100' : 'bg-red-100'">
+          <span class="text-2xl font-bold"
+                [class]="score() >= 70 ? 'text-green-600' : 'text-red-600'">
+            {{ score() }}%
+          </span>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+          {{ score() >= 70 ? 'Congratulations!' : 'Keep Learning!' }}
+        </h2>
+        <p class="text-gray-600">
+          You scored {{ score() }}% on this exam.
+          {{ score() >= 70 ? 'Well done!' : 'Review the material and try again.' }}
+        </p>
+      </div>
+      
+      <div class="flex justify-center space-x-4">
+        <button type="button"
+                (click)="router.navigate(['/exams'])"
+                class="btn-secondary">
+          Back to Exams
+        </button>
+        <button type="button"
+                (click)="router.navigate(['/courses'])"
+                class="btn-primary">
+          Continue Learning
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

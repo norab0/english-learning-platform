@@ -127,6 +127,50 @@ export class ExamsService {
     return score;
   }
 
+  // New method for direct exam submission with answers
+  submitExamAttempt(examId: string, answers: { [questionId: string]: number }, score: number): void {
+    const attempt: ExamAttempt = {
+      id: Date.now().toString(),
+      examId,
+      userId: 'current-user', // This should come from auth service
+      answers: Object.entries(answers).map(([questionId, answerIndex]) => ({
+        questionId,
+        answer: answerIndex.toString(),
+        isCorrect: false // Will be calculated later
+      })),
+      score,
+      startedAt: new Date(),
+      completedAt: new Date()
+    };
+
+    this._attempts.update(attempts => [...attempts, attempt]);
+  }
+
+  // Get user's exam attempts
+  getUserAttempts(userId: string): ExamAttempt[] {
+    return this._attempts().filter(attempt => attempt.userId === userId);
+  }
+
+  // Get exam statistics
+  getExamStatistics(examId: string): { totalAttempts: number; averageScore: number; passRate: number } {
+    const examAttempts = this._attempts().filter(attempt => attempt.examId === examId);
+    const totalAttempts = examAttempts.length;
+    
+    if (totalAttempts === 0) {
+      return { totalAttempts: 0, averageScore: 0, passRate: 0 };
+    }
+
+    const totalScore = examAttempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0);
+    const averageScore = Math.round(totalScore / totalAttempts);
+    
+    const exam = this.getExamById(examId);
+    const passingScore = exam?.passingScore || 70;
+    const passedAttempts = examAttempts.filter(attempt => (attempt.score || 0) >= passingScore).length;
+    const passRate = Math.round((passedAttempts / totalAttempts) * 100);
+
+    return { totalAttempts, averageScore, passRate };
+  }
+
   private isAnswerCorrect(question: Question, answer: string | string[]): boolean {
     if (question.type === 'multiple-choice' || question.type === 'true-false') {
       return answer === question.correctAnswer;
