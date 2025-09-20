@@ -2,7 +2,8 @@ export interface Exam {
   id: string;
   title: string;
   description: string;
-  courseId: string;
+  courseId?: string; // Made optional for standalone exams
+  level: 'beginner' | 'intermediate' | 'advanced';
   questions: Question[];
   duration: number; // in minutes
   passingScore: number; // percentage

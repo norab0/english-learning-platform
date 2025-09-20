@@ -127,6 +127,30 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
+  updateUserProfile(profileData: { firstName: string; lastName: string }): void {
+    const currentUser = this._currentUser();
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        firstName: profileData.firstName,
+        lastName: profileData.lastName
+      };
+      
+      this._currentUser.set(updatedUser);
+      
+      // Update in localStorage
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      
+      // Update in registered users list
+      const users = this.getStoredUsers();
+      const userIndex = users.findIndex(u => u.id === currentUser.id);
+      if (userIndex !== -1) {
+        users[userIndex] = updatedUser;
+        localStorage.setItem('registeredUsers', JSON.stringify(users));
+      }
+    }
+  }
+
   private loadUserFromStorage(): void {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {

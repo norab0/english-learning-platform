@@ -11,5 +11,10 @@ export const examsRoutes: Routes = [
     path: 'take/:id',
     loadComponent: () => import('./components/exam-take/exam-take').then(m => m.ExamTakeComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: 'results/:id',
+    loadComponent: () => import('./components/exam-results/exam-results').then(m => m.ExamResultsComponent),
+    canActivate: [authGuard]
   }
 ];

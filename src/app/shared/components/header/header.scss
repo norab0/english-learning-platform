@@ -1,74 +1,192 @@
-/* Header Component Styles */
+/* Enhanced Header Component Styles */
 nav {
-  transition: all 0.3s ease-in-out;
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
-/* Navigation links */
+/* Logo Styles */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #2563eb;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+.logo-subtitle {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1;
+}
+
+/* Navigation Links */
 a {
-  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+  font-weight: 500;
 }
 
 a:hover {
-  transform: translateY(-1px);
+  color: #2563eb;
 }
 
-/* User avatar */
-.w-8.h-8 {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  transition: transform 0.2s ease-in-out;
-}
-
-.w-8.h-8:hover {
-  transform: scale(1.1);
-}
-
-/* Mobile menu */
-.md\\:hidden > div {
-  animation: slideDown 0.3s ease-in-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Button hover effects */
-button {
-  transition: all 0.2s ease-in-out;
-}
-
-button:hover {
-  transform: translateY(-1px);
-}
-
-/* Active link styling */
+/* Active Link Styling */
 .router-link-active {
+  color: #2563eb;
   font-weight: 600;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .space-y-1 > * + * {
-    margin-top: 0.25rem;
+/* User Profile Styles */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.user-avatar {
+  width: 2rem;
+  height: 2rem;
+  background: #2563eb;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+  line-height: 1;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1;
+}
+
+/* Notification Button */
+.notification-btn {
+  position: relative;
+  padding: 0.5rem;
+  color: #6b7280;
+  transition: color 0.2s ease-in-out;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.notification-btn:hover {
+  color: #2563eb;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: #ef4444;
+  border-radius: 50%;
+}
+
+/* Button Styles */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+  font-weight: 500;
+}
+
+button:hover {
+  color: #dc2626;
+}
+
+/* Smooth Transitions */
+* {
+  transition: color 0.2s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .space-x-8 > * + * {
+    margin-left: 1.5rem;
   }
 }
 
-/* Focus states for accessibility */
-button:focus,
-a:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+@media (max-width: 768px) {
+  .space-x-8 > * + * {
+    margin-left: 1rem;
+  }
+  
+  .space-x-4 > * + * {
+    margin-left: 0.5rem;
+  }
+  
+  .space-x-3 > * + * {
+    margin-left: 0.75rem;
+  }
+  
+  .space-x-2 > * + * {
+    margin-left: 0.25rem;
+  }
+  
+  /* Hide some elements on mobile */
+  .user-info {
+    display: none;
+  }
+  
+  .notification-btn {
+    display: none;
+  }
 }
 
-/* Smooth transitions for all interactive elements */
-* {
-  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+@media (max-width: 640px) {
+  .space-x-8 > * + * {
+    margin-left: 0.75rem;
+  }
+  
+  .logo-subtitle {
+    display: none;
+  }
 }

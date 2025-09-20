@@ -1,0 +1,111 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="text-center py-12">
+      <div class="spinner mx-auto mb-4"></div>
+      <p class="text-gray-600">Loading results...</p>
+    </div>
+
+    <!-- Results Content -->
+    <div *ngIf="!isLoading() && exam() && attempt()" class="space-y-8">
+      <!-- Header -->
+      <div class="text-center">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Exam Results</h1>
+        <h2 class="text-2xl text-gray-700 mb-2">{{ exam()?.title }}</h2>
+        <p class="text-gray-600">{{ exam()?.description }}</p>
+      </div>
+
+      <!-- Score Card -->
+      <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+        <div class="mb-6">
+          <div class="text-6xl font-bold mb-4" [class]="scoreColor()">
+            {{ score() }}%
+          </div>
+          <div class="inline-flex items-center px-4 py-2 rounded-full text-lg font-medium" [class]="scoreBadgeClass()">
+            {{ passed() ? 'Passed' : 'Failed' }}
+          </div>
+        </div>
+
+        <div class="text-gray-600 mb-6">
+          <p>Passing Score: {{ exam()?.passingScore }}%</p>
+          <p>Completed on: {{ attempt()?.completedAt | date:'medium' }}</p>
+        </div>
+
+        <!-- Performance Message -->
+        <div class="mb-8">
+          <div *ngIf="score() >= 90" class="text-green-600">
+            <h3 class="text-xl font-semibold mb-2">Excellent Work! 🌟</h3>
+            <p>Outstanding performance! You've mastered this material.</p>
+          </div>
+          <div *ngIf="score() >= 80 && score() < 90" class="text-green-600">
+            <h3 class="text-xl font-semibold mb-2">Great Job! 👍</h3>
+            <p>Well done! You have a solid understanding of the material.</p>
+          </div>
+          <div *ngIf="score() >= 70 && score() < 80" class="text-yellow-600">
+            <h3 class="text-xl font-semibold mb-2">Good Effort! 💪</h3>
+            <p>You passed! Consider reviewing some areas for improvement.</p>
+          </div>
+          <div *ngIf="score() < 70" class="text-red-600">
+            <h3 class="text-xl font-semibold mb-2">Keep Learning! 📚</h3>
+            <p>Don't give up! Review the material and try again.</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-4">
+          <button
+            (click)="retakeExam()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            Retake Exam
+          </button>
+          <button
+            (click)="goToExams()"
+            class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            Back to Exams
+          </button>
+        </div>
+      </div>
+
+      <!-- Exam Details -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Exam Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-medium text-gray-700 mb-2">Duration</h4>
+            <p class="text-gray-600">{{ exam()?.duration }} minutes</p>
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-700 mb-2">Level</h4>
+            <p class="text-gray-600 capitalize">{{ exam()?.level }}</p>
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-700 mb-2">Total Questions</h4>
+            <p class="text-gray-600">{{ exam()?.questions?.length || 0 }}</p>
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-700 mb-2">Time Taken</h4>
+            <p class="text-gray-600">
+              {{ getTimeTaken() }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading() && (!exam() || !attempt())" class="text-center py-12">
+      <div class="text-gray-500 mb-4">
+        <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Results not found</h3>
+      <p class="text-gray-500 mb-4">The exam results you're looking for don't exist or have been removed.</p>
+      <button
+        (click)="goToExams()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        Back to Exams
+      </button>
+    </div>
+  </div>
+</div>

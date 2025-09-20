@@ -67,12 +67,17 @@ export class RegisterComponent {
       const success = await this.authService.register(userData);
       
       if (success) {
-        this.router.navigate(['/courses']);
+        // Redirect based on user role
+        const user = this.authService.currentUser();
+        if (user?.role === 'admin') {
+          this.router.navigate(['/users/admin']);
+        } else {
+          this.router.navigate(['/courses']);
+        }
       }
       
       this._isSubmitting.set(false);
     } else {
-      console.log('Form is invalid, cannot submit');
       // Mark all fields as touched to show validation errors
       Object.keys(this.registerForm.controls).forEach(key => {
         this.registerForm.get(key)?.markAsTouched();
@@ -99,26 +104,4 @@ export class RegisterComponent {
     return '';
   }
 
-  async testRegister(): Promise<void> {
-    console.log('Testing register with admin account...');
-    
-    const userData = {
-      firstName: 'Test',
-      lastName: 'Admin',
-      email: 'test@admin.com',
-      password: 'test123',
-      role: 'admin' as 'user' | 'admin'
-    };
-    
-    console.log('Submitting test user data:', userData);
-    
-    const success = await this.authService.register(userData);
-    
-    if (success) {
-      console.log('Test registration successful!');
-      this.router.navigate(['/courses']);
-    } else {
-      console.log('Test registration failed');
-    }
-  }
 }

@@ -36,6 +36,7 @@ export class ExamsService {
 
   constructor() {
     this.loadMockData();
+    this.loadFromStorage();
   }
 
   async loadExams(): Promise<void> {
@@ -74,6 +75,10 @@ export class ExamsService {
 
     this._attempts.update(attempts => [...attempts, attempt]);
     return attempt;
+  }
+
+  getAttemptById(attemptId: string): ExamAttempt | undefined {
+    return this._attempts().find(attempt => attempt.id === attemptId);
   }
 
   async submitAnswer(attemptId: string, questionId: string, answer: string | string[]): Promise<void> {
@@ -211,6 +216,31 @@ export class ExamsService {
     return false;
   }
 
+  private loadFromStorage(): void {
+    try {
+      const storedExams = localStorage.getItem('english-learning-exams');
+      if (storedExams) {
+        const parsedExams = JSON.parse(storedExams);
+        // Merge with existing mock data, avoiding duplicates
+        const existingIds = this._exams().map(exam => exam.id);
+        const newExams = parsedExams.filter((exam: Exam) => !existingIds.includes(exam.id));
+        if (newExams.length > 0) {
+          this._exams.update(exams => [...exams, ...newExams]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading exams from storage:', error);
+    }
+  }
+
+  private saveToStorage(): void {
+    try {
+      localStorage.setItem('english-learning-exams', JSON.stringify(this._exams()));
+    } catch (error) {
+      console.error('Error saving exams to storage:', error);
+    }
+  }
+
   private loadMockData(): void {
     const mockExams: Exam[] = [
       {
@@ -218,6 +248,7 @@ export class ExamsService {
         title: 'English Basics Test',
         description: 'Test your knowledge of basic English grammar and vocabulary',
         courseId: '1',
+        level: 'beginner',
         duration: 30,
         passingScore: 70,
         questions: [
@@ -268,6 +299,7 @@ export class ExamsService {
         title: 'Intermediate Conversation Test',
         description: 'Test your intermediate conversation skills',
         courseId: '2',
+        level: 'intermediate',
         duration: 45,
         passingScore: 75,
         questions: [
@@ -310,6 +342,7 @@ export class ExamsService {
         title: 'Advanced Grammar Test',
         description: 'Test your advanced English grammar knowledge',
         courseId: '3',
+        level: 'advanced',
         duration: 60,
         passingScore: 80,
         questions: [
@@ -363,6 +396,7 @@ export class ExamsService {
         title: 'Business English Test',
         description: 'Test your business English vocabulary and expressions',
         courseId: '4',
+        level: 'intermediate',
         duration: 40,
         passingScore: 75,
         questions: [
@@ -421,6 +455,7 @@ export class ExamsService {
         title: 'Vocabulary Test',
         description: 'Test your English vocabulary knowledge',
         courseId: '5',
+        level: 'beginner',
         duration: 35,
         passingScore: 70,
         questions: [
@@ -470,6 +505,62 @@ export class ExamsService {
     ];
 
     this._exams.set(mockExams);
+  }
+
+  // Admin CRUD operations
+  async addExam(exam: Omit<Exam, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      await this.delay(500);
+      const newExam: Exam = {
+        ...exam,
+        id: Date.now().toString(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      console.log('Adding new exam:', newExam);
+      this._exams.update(exams => {
+        const updated = [...exams, newExam];
+        console.log('Updated exams list:', updated);
+        return updated;
+      });
+      this.saveToStorage();
+    } catch (error) {
+      this._error.set('Failed to add exam');
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  async updateExam(updatedExam: Exam): Promise<void> {
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      await this.delay(500);
+        this._exams.update(exams =>
+          exams.map(exam => (exam.id === updatedExam.id ? { ...updatedExam, updatedAt: new Date() } : exam))
+        );
+        this.saveToStorage();
+    } catch (error) {
+      this._error.set('Failed to update exam');
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  async deleteExam(examId: string): Promise<void> {
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      await this.delay(500);
+        this._exams.update(exams => exams.filter(exam => exam.id !== examId));
+        this.saveToStorage();
+    } catch (error) {
+      this._error.set('Failed to delete exam');
+    } finally {
+      this._isLoading.set(false);
+    }
   }
 
   private delay(ms: number): Promise<void> {

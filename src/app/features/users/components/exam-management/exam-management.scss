@@ -1,0 +1,155 @@
+/* Exam Management Component Styles */
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.bg-white {
+  background-color: #ffffff;
+}
+
+.bg-blue-600 {
+  background-color: #2563eb;
+}
+
+.bg-blue-700 {
+  background-color: #1d4ed8;
+}
+
+.bg-green-600 {
+  background-color: #059669;
+}
+
+.bg-green-700 {
+  background-color: #047857;
+}
+
+.bg-gray-500 {
+  background-color: #6b7280;
+}
+
+.bg-gray-600 {
+  background-color: #4b5563;
+}
+
+.bg-green-100 {
+  background-color: #dcfce7;
+}
+
+.bg-green-800 {
+  color: #166534;
+}
+
+.bg-yellow-100 {
+  background-color: #fef3c7;
+}
+
+.bg-yellow-800 {
+  color: #92400e;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+
+.bg-red-800 {
+  color: #991b1b;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+.bg-gray-800 {
+  color: #1f2937;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.text-gray-900 {
+  color: #111827;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.text-blue-800 {
+  color: #1e40af;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.text-red-800 {
+  color: #991b1b;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: #1d4ed8;
+}
+
+.hover\:bg-green-700:hover {
+  background-color: #047857;
+}
+
+.hover\:bg-gray-600:hover {
+  background-color: #4b5563;
+}
+
+.hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.hover\:text-blue-800:hover {
+  color: #1e40af;
+}
+
+.hover\:text-red-800:hover {
+  color: #991b1b;
+}
+
+.disabled\:bg-gray-400:disabled {
+  background-color: #9ca3af;
+}
+
+.focus\:outline-none:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus\:ring-blue-500:focus {
+  --tw-ring-color: #3b82f6;
+}

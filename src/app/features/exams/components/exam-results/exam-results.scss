@@ -1,0 +1,93 @@
+/* Exam Results Component Styles */
+.spinner {
+  @apply inline-block w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin;
+}
+
+/* Score Display */
+.score-display {
+  @apply transition-all duration-500 ease-out;
+}
+
+/* Performance Messages */
+.performance-message {
+  @apply p-6 rounded-lg border-2;
+}
+
+.performance-message.excellent {
+  @apply bg-green-50 border-green-200;
+}
+
+.performance-message.good {
+  @apply bg-green-50 border-green-200;
+}
+
+.performance-message.passed {
+  @apply bg-yellow-50 border-yellow-200;
+}
+
+.performance-message.failed {
+  @apply bg-red-50 border-red-200;
+}
+
+/* Action Buttons */
+.action-button {
+  @apply transition-all duration-200 transform;
+}
+
+.action-button:hover {
+  @apply scale-105 shadow-lg;
+}
+
+/* Score Badge */
+.score-badge {
+  @apply inline-flex items-center px-4 py-2 rounded-full text-lg font-medium transition-all duration-300;
+}
+
+/* Exam Details Grid */
+.exam-details {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .score-display {
+    @apply text-4xl;
+  }
+  
+  .action-buttons {
+    @apply flex-col space-y-3 space-x-0;
+  }
+  
+  .action-button {
+    @apply w-full;
+  }
+}
+
+/* Animation for score reveal */
+@keyframes scoreReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.score-reveal {
+  animation: scoreReveal 1s ease-out;
+}
+
+/* Success/Error Icons */
+.result-icon {
+  @apply w-6 h-6 mr-2;
+}
+
+/* Card Hover Effects */
+.result-card {
+  @apply transition-all duration-300 hover:shadow-xl;
+}

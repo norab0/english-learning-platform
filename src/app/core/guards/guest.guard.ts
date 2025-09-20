@@ -13,7 +13,7 @@ export class GuestGuard implements CanActivate {
     if (this.authService.isAuthenticated()) {
       // Redirect to appropriate dashboard based on user role
       if (this.authService.isAdmin()) {
-        this.router.navigate(['/users/admin-dashboard']);
+        this.router.navigate(['/users/admin']);
       } else {
         this.router.navigate(['/courses']);
       }

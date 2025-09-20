@@ -12,24 +12,13 @@ import { AuthService } from '../../../features/auth/services/auth';
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
-  private _isMenuOpen = signal(false);
 
   // Computed signals
-  public readonly isMenuOpen = this._isMenuOpen.asReadonly();
   public readonly currentUser = computed(() => this.authService.currentUser());
   public readonly isAuthenticated = computed(() => this.authService.isAuthenticated());
   public readonly isAdmin = computed(() => this.authService.isAdmin());
 
-  toggleMenu(): void {
-    this._isMenuOpen.set(!this._isMenuOpen());
-  }
-
-  closeMenu(): void {
-    this._isMenuOpen.set(false);
-  }
-
   logout(): void {
     this.authService.logout();
-    this.closeMenu();
   }
 }

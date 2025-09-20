@@ -1,178 +1,114 @@
-<div class="container mx-auto p-6">
-  <h1 class="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
-
-  <!-- Stats Overview -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="card text-center">
-      <h3 class="text-lg font-semibold text-gray-700">Total Users</h3>
-      <p class="text-2xl font-bold text-blue-600">{{ totalUsers() }}</p>
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+      <p class="mt-2 text-gray-600">Manage your English learning platform</p>
     </div>
-    <div class="card text-center">
-      <h3 class="text-lg font-semibold text-gray-700">Admins</h3>
-      <p class="text-2xl font-bold text-purple-600">{{ adminUsers().length }}</p>
-    </div>
-    <div class="card text-center">
-      <h3 class="text-lg font-semibold text-gray-700">Exam Results</h3>
-      <p class="text-2xl font-bold text-green-600">{{ totalScores() }}</p>
-    </div>
-    <div class="card text-center">
-      <h3 class="text-lg font-semibold text-gray-700">Avg Score</h3>
-      <p class="text-2xl font-bold text-emerald-600">{{ averageScore() | number:'1.0-0' }}%</p>
-    </div>
-  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Users Management -->
-    <div class="card">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-gray-800">Users</h2>
-        <button (click)="showAddUser.set(!showAddUser())" class="btn-primary">+ Add User</button>
-      </div>
-
-      <!-- Add User Form -->
-      <div *ngIf="showAddUser" class="mb-4 p-4 bg-gray-50 rounded-lg">
-        <h3 class="font-medium text-gray-800 mb-3">Add New User</h3>
-        <form (ngSubmit)="addUser()" class="space-y-3">
-          <div class="grid grid-cols-2 gap-3">
-            <input
-              type="text"
-              [(ngModel)]="newUser.firstName"
-              name="firstName"
-              placeholder="First Name"
-              class="form-input"
-              required
-            />
-            <input
-              type="text"
-              [(ngModel)]="newUser.lastName"
-              name="lastName"
-              placeholder="Last Name"
-              class="form-input"
-              required
-            />
-          </div>
-          <input
-            type="email"
-            [(ngModel)]="newUser.email"
-            name="email"
-            placeholder="Email"
-            class="form-input"
-            required
-          />
-          <div class="grid grid-cols-2 gap-3">
-            <input
-              type="password"
-              [(ngModel)]="newUser.password"
-              name="password"
-              placeholder="Password"
-              class="form-input"
-              required
-            />
-            <select [(ngModel)]="newUser.role" name="role" class="form-input">
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div class="flex space-x-2">
-            <button type="submit" class="btn-primary flex-1">Create</button>
-            <button type="button" (click)="showAddUser.set(false)" class="btn-secondary flex-1">Cancel</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Users List -->
-      <div class="space-y-2">
-        <div *ngFor="let user of users()" 
-             class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-          <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <span class="text-white text-sm font-bold">
-                {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
-              </span>
-            </div>
-            <div>
-              <h3 class="font-medium text-gray-900">{{ user.firstName }} {{ user.lastName }}</h3>
-              <p class="text-sm text-gray-500">{{ user.email }}</p>
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <span class="px-2 py-1 text-xs font-medium rounded-full" 
-                  [class]="getRoleBadgeClass(user.role)">
-              {{ user.role }}
-            </span>
-            <button (click)="toggleUserRole(user)" 
-                    class="text-blue-600 hover:text-blue-800 text-sm">
-              {{ user.role === 'admin' ? 'Make User' : 'Make Admin' }}
-            </button>
-            <button (click)="deleteUser(user)" 
-                    class="text-red-600 hover:text-red-800 text-sm">
-              Delete
-            </button>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Total Courses</p>
+            <p class="text-2xl font-bold text-gray-900">{{ totalCourses() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Total Exams</p>
+            <p class="text-2xl font-bold text-gray-900">{{ totalExams() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Active Users</p>
+            <p class="text-2xl font-bold text-gray-900">-</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Exam Results</p>
+            <p class="text-2xl font-bold text-gray-900">-</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Exam Results -->
-    <div class="card">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Exam Results</h2>
-      
-      <div *ngIf="recentScores().length === 0" class="text-center py-8 text-gray-500">
-        No exam results yet
-      </div>
-
-      <div *ngIf="recentScores().length > 0" class="space-y-2">
-        <div *ngFor="let score of recentScores()" 
-             class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-          <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-              <span class="text-white text-sm font-bold">
-                {{ score.userName.charAt(0) }}
-              </span>
-            </div>
-            <div>
-              <h3 class="font-medium text-gray-900">{{ score.userName }}</h3>
-              <p class="text-sm text-gray-500">{{ score.examTitle }}</p>
-              <p class="text-xs text-gray-400">{{ score.completedAt | date:'short' }}</p>
-            </div>
-          </div>
-          <div class="flex items-center space-x-3">
-            <span class="text-lg font-bold" [class]="getScoreColor(score.percentage)">
-              {{ score.percentage }}%
-            </span>
-            <span class="px-2 py-1 text-xs font-medium rounded-full"
-                  [class]="score.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-              {{ score.passed ? 'Passed' : 'Failed' }}
-            </span>
-          </div>
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <div class="space-y-4">
+          <a routerLink="/users/admin/courses" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Manage Courses
+          </a>
+          <a routerLink="/users/admin/exams" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Manage Exams
+          </a>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Top Performers -->
-  <div class="card mt-6">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Top Performers</h2>
-    
-    <div *ngIf="topPerformers().length === 0" class="text-center py-8 text-gray-500">
-      No top performers yet
-    </div>
-
-    <div *ngIf="topPerformers().length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div *ngFor="let score of topPerformers(); let i = index" 
-           class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-        <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-            <span class="text-white text-sm font-bold">{{ i + 1 }}</span>
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        <div class="space-y-3">
+          <div class="flex items-center text-sm text-gray-600">
+            <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+            System running normally
           </div>
-          <div>
-            <h3 class="font-medium text-gray-900">{{ score.userName }}</h3>
-            <p class="text-sm text-gray-500">{{ score.examTitle }}</p>
+          <div class="flex items-center text-sm text-gray-600">
+            <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+            {{ totalCourses() }} courses available
+          </div>
+          <div class="flex items-center text-sm text-gray-600">
+            <div class="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+            {{ totalExams() }} exams ready
           </div>
         </div>
-        <span class="text-lg font-bold" [class]="getScoreColor(score.percentage)">
-          {{ score.percentage }}%
-        </span>
       </div>
     </div>
   </div>

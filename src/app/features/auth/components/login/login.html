@@ -14,6 +14,10 @@
             Create one here
           </a>
         </p>
+        <div class="mt-4 text-center text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">
+          <p><strong>Demo:</strong> admin@test.com / admin123</p>
+          <p><strong>Demo:</strong> user@test.com / user123</p>
+        </div>
       </div>
     
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
@@ -54,30 +58,12 @@
       <div>
         <button
           type="submit"
-          [disabled]="!isFormValid()"
           class="btn-primary w-full flex justify-center py-2 px-4"
         >
           <div *ngIf="isSubmitting()" class="spinner mr-2"></div>
           {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
         </button>
         
-        <!-- Bouton de test temporaire -->
-        <button
-          type="button"
-          (click)="testLogin()"
-          class="btn-secondary w-full flex justify-center py-2 px-4 mt-2"
-        >
-          Test Login (Admin)
-        </button>
-      </div>
-
-      <div class="text-center text-sm text-gray-600 bg-blue-50 p-4 rounded-lg">
-        <p class="font-medium text-blue-800 mb-2">Demo accounts for testing:</p>
-        <div class="space-y-1">
-          <p><strong>Admin:</strong> admin@test.com / admin123</p>
-          <p><strong>Student:</strong> user@test.com / user123</p>
-        </div>
-        <p class="text-xs text-gray-500 mt-2">Click on any account to auto-fill the form</p>
       </div>
     </form>
     </div>

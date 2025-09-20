@@ -14,6 +14,7 @@ export class CoursesService {
   public readonly courses = this._courses.asReadonly();
   public readonly isLoading = this._isLoading.asReadonly();
   public readonly error = this._error.asReadonly();
+  public readonly totalCourses = computed(() => this._courses().length);
 
   // Computed courses by level
   public readonly beginnerCourses = computed(() => 
@@ -28,6 +29,7 @@ export class CoursesService {
 
   constructor() {
     this.loadMockData();
+    this.loadFromStorage();
   }
 
   async loadCourses(): Promise<void> {
@@ -47,6 +49,31 @@ export class CoursesService {
 
   getCourseById(id: string): Course | undefined {
     return this._courses().find(course => course.id === id);
+  }
+
+  private loadFromStorage(): void {
+    try {
+      const storedCourses = localStorage.getItem('english-learning-courses');
+      if (storedCourses) {
+        const parsedCourses = JSON.parse(storedCourses);
+        // Merge with existing mock data, avoiding duplicates
+        const existingIds = this._courses().map(course => course.id);
+        const newCourses = parsedCourses.filter((course: Course) => !existingIds.includes(course.id));
+        if (newCourses.length > 0) {
+          this._courses.update(courses => [...courses, ...newCourses]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading courses from storage:', error);
+    }
+  }
+
+  private saveToStorage(): void {
+    try {
+      localStorage.setItem('english-learning-courses', JSON.stringify(this._courses()));
+    } catch (error) {
+      console.error('Error saving courses to storage:', error);
+    }
   }
 
   private loadMockData(): void {
@@ -152,7 +179,57 @@ export class CoursesService {
     this._courses.set(mockCourses);
   }
 
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    // Admin CRUD operations
+    async addCourse(course: Omit<Course, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
+      this._isLoading.set(true);
+      this._error.set(null);
+      try {
+        await this.delay(500);
+        const newCourse: Course = {
+          ...course,
+          id: Date.now().toString(),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        this._courses.update(courses => [...courses, newCourse]);
+        this.saveToStorage();
+      } catch (error) {
+        this._error.set('Failed to add course');
+      } finally {
+        this._isLoading.set(false);
+      }
+    }
+
+    async updateCourse(updatedCourse: Course): Promise<void> {
+      this._isLoading.set(true);
+      this._error.set(null);
+      try {
+        await this.delay(500);
+        this._courses.update(courses =>
+          courses.map(course => (course.id === updatedCourse.id ? { ...updatedCourse, updatedAt: new Date() } : course))
+        );
+        this.saveToStorage();
+      } catch (error) {
+        this._error.set('Failed to update course');
+      } finally {
+        this._isLoading.set(false);
+      }
+    }
+
+    async deleteCourse(courseId: string): Promise<void> {
+      this._isLoading.set(true);
+      this._error.set(null);
+      try {
+        await this.delay(500);
+        this._courses.update(courses => courses.filter(course => course.id !== courseId));
+      } catch (error) {
+        this._error.set('Failed to delete course');
+      } finally {
+        this._isLoading.set(false);
+      }
+    }
+
+    private delay(ms: number): Promise<void> {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
   }
-}

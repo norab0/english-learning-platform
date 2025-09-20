@@ -1,0 +1,249 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Course Management</h1>
+          <p class="mt-2 text-gray-600">Manage your English learning courses</p>
+        </div>
+        <button 
+          (click)="toggleAddForm()" 
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
+          {{ showAddForm() ? 'Cancel' : 'Add New Course' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Add/Edit Course Form -->
+    <div *ngIf="showAddForm()" class="mb-8">
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">
+          {{ editingCourse() ? 'Edit Course' : 'Add New Course' }}
+        </h2>
+        
+        <form [formGroup]="courseForm" (ngSubmit)="saveCourse()" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="title" class="block text-sm font-medium text-gray-700 mb-1">
+                Course Title *
+              </label>
+              <input
+                id="title"
+                type="text"
+                formControlName="title"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter course title"
+              />
+              <div *ngIf="courseForm.get('title')?.invalid && courseForm.get('title')?.touched" class="text-red-500 text-sm mt-1">
+                <div *ngIf="courseForm.get('title')?.errors?.['required']">Title is required</div>
+                <div *ngIf="courseForm.get('title')?.errors?.['minlength']">Title must be at least 3 characters</div>
+              </div>
+            </div>
+            
+            <div>
+              <label for="level" class="block text-sm font-medium text-gray-700 mb-1">
+                Level *
+              </label>
+              <select
+                id="level"
+                formControlName="level"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+              <div *ngIf="courseForm.get('level')?.invalid && courseForm.get('level')?.touched" class="text-red-500 text-sm mt-1">
+                <div *ngIf="courseForm.get('level')?.errors?.['required']">Level is required</div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+              Description *
+            </label>
+            <textarea
+              id="description"
+              formControlName="description"
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter course description"
+            ></textarea>
+            <div *ngIf="courseForm.get('description')?.invalid && courseForm.get('description')?.touched" class="text-red-500 text-sm mt-1">
+              <div *ngIf="courseForm.get('description')?.errors?.['required']">Description is required</div>
+              <div *ngIf="courseForm.get('description')?.errors?.['minlength']">Description must be at least 10 characters</div>
+            </div>
+          </div>
+          
+          <div>
+            <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">
+              Duration (minutes) *
+            </label>
+            <input
+              id="duration"
+              type="number"
+              formControlName="duration"
+              min="1"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter duration in minutes"
+            />
+            <div *ngIf="courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched" class="text-red-500 text-sm mt-1">
+              <div *ngIf="courseForm.get('duration')?.errors?.['required']">Duration is required</div>
+              <div *ngIf="courseForm.get('duration')?.errors?.['min']">Duration must be at least 1 minute</div>
+            </div>
+          </div>
+          
+          <!-- Lessons Section -->
+          <div [formGroup]="lessonsForm">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium text-gray-900">Course Lessons</h3>
+              <button
+                type="button"
+                (click)="addLesson()"
+                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-medium"
+              >
+                Add Lesson
+              </button>
+            </div>
+            
+            <div formArrayName="lessons" class="space-y-4">
+              <div *ngFor="let lesson of lessonsArray.controls; let i = index" 
+                   [formGroupName]="i" 
+                   class="border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-start mb-3">
+                  <h4 class="font-medium text-gray-900">Lesson {{ i + 1 }}</h4>
+                  <button
+                    type="button"
+                    (click)="removeLesson(i)"
+                    *ngIf="lessonsArray.length > 1"
+                    class="text-red-600 hover:text-red-800 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+                
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Lesson Title *
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="title"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter lesson title"
+                    />
+                    <div *ngIf="lesson.get('title')?.invalid && lesson.get('title')?.touched" class="text-red-500 text-sm mt-1">
+                      <div *ngIf="lesson.get('title')?.errors?.['required']">Lesson title is required</div>
+                      <div *ngIf="lesson.get('title')?.errors?.['minlength']">Lesson title must be at least 3 characters</div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Lesson Content *
+                    </label>
+                    <textarea
+                      formControlName="content"
+                      rows="3"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter lesson content"
+                    ></textarea>
+                    <div *ngIf="lesson.get('content')?.invalid && lesson.get('content')?.touched" class="text-red-500 text-sm mt-1">
+                      <div *ngIf="lesson.get('content')?.errors?.['required']">Lesson content is required</div>
+                      <div *ngIf="lesson.get('content')?.errors?.['minlength']">Lesson content must be at least 10 characters</div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Duration (minutes) *
+                    </label>
+                    <input
+                      type="number"
+                      formControlName="duration"
+                      min="1"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="30"
+                    />
+                    <div *ngIf="lesson.get('duration')?.invalid && lesson.get('duration')?.touched" class="text-red-500 text-sm mt-1">
+                      <div *ngIf="lesson.get('duration')?.errors?.['required']">Duration is required</div>
+                      <div *ngIf="lesson.get('duration')?.errors?.['min']">Duration must be at least 1 minute</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex space-x-3">
+            <button
+              type="submit"
+              [disabled]="isSubmitting() || !isFormValid()"
+              class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium"
+            >
+              {{ isSubmitting() ? 'Saving...' : (editingCourse() ? 'Update Course' : 'Create Course') }}
+            </button>
+            <button
+              type="button"
+              (click)="cancelEdit()"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Courses List -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-200">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">All Courses ({{ courses().length }})</h3>
+      </div>
+      
+      <div *ngIf="courses().length === 0" class="p-8 text-center text-gray-500">
+        <p>No courses available. Create your first course!</p>
+      </div>
+      
+      <div *ngIf="courses().length > 0" class="divide-y divide-gray-200">
+        <div *ngFor="let course of courses()" class="p-6 hover:bg-gray-50">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-2">
+                <h4 class="text-lg font-medium text-gray-900">{{ course.title }}</h4>
+                <span [class]="getLevelBadgeClass(course.level)" 
+                      class="px-2 py-1 rounded-full text-xs font-medium">
+                  {{ course.level | titlecase }}
+                </span>
+              </div>
+              <p class="text-gray-600 mb-2">{{ course.description }}</p>
+              <div class="flex items-center space-x-4 text-sm text-gray-500">
+                <span>Duration: {{ course.duration }} min</span>
+                <span>Lessons: {{ course.lessons.length }}</span>
+                <span>Created: {{ course.createdAt | date:'short' }}</span>
+              </div>
+            </div>
+            
+            <div class="flex space-x-2">
+              <button
+                (click)="editCourse(course)"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium"
+              >
+                Edit
+              </button>
+              <button
+                (click)="deleteCourse(course.id)"
+                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-medium"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

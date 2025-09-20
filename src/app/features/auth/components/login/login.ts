@@ -17,17 +17,7 @@ export class LoginComponent {
 
   // Computed signals
   public readonly isSubmitting = this._isSubmitting.asReadonly();
-  public readonly isFormValid = computed(() => {
-    const isValid = this.loginForm.valid && !this._isSubmitting();
-    console.log('Form validation check:', {
-      formValid: this.loginForm.valid,
-      isSubmitting: this._isSubmitting(),
-      finalResult: isValid,
-      formValue: this.loginForm.value,
-      formErrors: this.loginForm.errors
-    });
-    return isValid;
-  });
+  public readonly isFormValid = computed(() => this.loginForm.valid && !this._isSubmitting());
 
   constructor(
     private fb: FormBuilder,
@@ -44,20 +34,19 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this._isSubmitting.set(true);
       
-      console.log('Attempting login with:', this.loginForm.value);
       const success = await this.authService.login(this.loginForm.value);
-      console.log('Login result:', success);
       
       if (success) {
-        console.log('Login successful, navigating to courses');
-        this.router.navigate(['/courses']);
-      } else {
-        console.log('Login failed');
+        // Redirect based on user role
+        const user = this.authService.currentUser();
+        if (user?.role === 'admin') {
+          this.router.navigate(['/users/admin']);
+        } else {
+          this.router.navigate(['/courses']);
+        }
       }
       
       this._isSubmitting.set(false);
-    } else {
-      console.log('Form is invalid:', this.loginForm.errors);
     }
   }
 
@@ -77,26 +66,4 @@ export class LoginComponent {
     return '';
   }
 
-  async testLogin(): Promise<void> {
-    console.log('Test login clicked');
-    this._isSubmitting.set(true);
-    
-    const testCredentials = {
-      email: 'admin@test.com',
-      password: 'admin123'
-    };
-    
-    console.log('Attempting test login with:', testCredentials);
-    const success = await this.authService.login(testCredentials);
-    console.log('Test login result:', success);
-    
-    if (success) {
-      console.log('Test login successful, navigating to courses');
-      this.router.navigate(['/courses']);
-    } else {
-      console.log('Test login failed');
-    }
-    
-    this._isSubmitting.set(false);
-  }
 }
