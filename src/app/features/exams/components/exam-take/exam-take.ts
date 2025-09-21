@@ -3,14 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ExamsService } from '../../../exams/services/exams';
 import { AuthService } from '../../../auth/services/auth';
-
-interface Question {
-  id: string;
-  text: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
-}
+import { Exam, Question } from '../../../../core/models/exam.model';
 
 @Component({
   selector: 'app-exam-take',
@@ -25,9 +18,9 @@ export class ExamTakeComponent implements OnInit {
   private examsService = inject(ExamsService);
   private authService = inject(AuthService);
 
-  exam = signal<any>(null);
+  exam = signal<Exam | null>(null);
   currentQuestionIndex = signal(0);
-  selectedAnswers = signal<{ [questionId: string]: number }>({});
+  selectedAnswers = signal<{ [questionId: string]: string | number }>({});
   timeRemaining = signal(0);
   isSubmitted = signal(false);
   score = signal(0);
@@ -77,6 +70,20 @@ export class ExamTakeComponent implements OnInit {
     }));
   }
 
+  selectTrueFalse(questionId: string, value: boolean): void {
+    this.selectedAnswers.update(answers => ({
+      ...answers,
+      [questionId]: value ? 0 : 1 // 0 for true, 1 for false
+    }));
+  }
+
+  onTextInput(questionId: string, value: string): void {
+    this.selectedAnswers.update(answers => ({
+      ...answers,
+      [questionId]: value
+    }));
+  }
+
   nextQuestion(): void {
     const currentIndex = this.currentQuestionIndex();
     if (currentIndex < this.totalQuestions() - 1) {
@@ -95,11 +102,30 @@ export class ExamTakeComponent implements OnInit {
     if (this.isSubmitted()) return;
 
     const exam = this.exam();
+    if (!exam) return;
+
     const answers = this.selectedAnswers();
     let correctAnswers = 0;
 
     exam.questions.forEach((question: Question) => {
-      if (answers[question.id] === question.correctAnswer) {
+      const userAnswer = answers[question.id];
+      let isCorrect = false;
+
+      if (question.type === 'multiple-choice') {
+        isCorrect = userAnswer === question.correctAnswer;
+      } else if (question.type === 'true-false') {
+        const correctIndex = question.correctAnswer === 'true' ? 0 : 1;
+        isCorrect = userAnswer === correctIndex;
+      } else if (question.type === 'fill-in-blank') {
+        const correctAnswers = Array.isArray(question.correctAnswer) 
+          ? question.correctAnswer 
+          : [question.correctAnswer];
+        isCorrect = correctAnswers.some((correct: string) => 
+          correct.toLowerCase().trim() === String(userAnswer || '').toLowerCase().trim()
+        );
+      }
+
+      if (isCorrect) {
         correctAnswers++;
       }
     });

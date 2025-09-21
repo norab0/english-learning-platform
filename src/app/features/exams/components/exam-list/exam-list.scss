@@ -1,0 +1,92 @@
+/* Exam List Component Styles */
+.card {
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Difficulty badges */
+.bg-green-100 {
+  background-color: #dcfce7;
+}
+
+.bg-yellow-100 {
+  background-color: #fef3c7;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+.text-green-800 {
+  color: #166534;
+}
+
+.text-yellow-800 {
+  color: #92400e;
+}
+
+.text-red-800 {
+  color: #991b1b;
+}
+
+.text-gray-800 {
+  color: #1f2937;
+}
+
+/* Button hover effects */
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+/* Loading spinner */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Grid responsive */
+@media (max-width: 768px) {
+  .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Empty state */
+.w-16.h-16 {
+  transition: transform 0.2s ease-in-out;
+}
+
+.w-16.h-16:hover {
+  transform: scale(1.1);
+}
+
+/* Exam stats */
+.border-gray-200 {
+  transition: border-color 0.2s ease-in-out;
+}
+
+.card:hover .border-gray-200 {
+  border-color: #3b82f6;
+}

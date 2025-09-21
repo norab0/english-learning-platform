@@ -39,21 +39,72 @@
 
       <!-- Answer Options -->
       <div class="space-y-3">
-        <div *ngFor="let option of question.options; let i = index" 
-             class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer transition-colors"
-             [class.bg-blue-50]="selectedAnswers()[question.id] === i"
-             [class.border-blue-500]="selectedAnswers()[question.id] === i"
-             (click)="selectAnswer(question.id, i)">
-          <input type="radio" 
-                 [id]="'option-' + question.id + '-' + i"
-                 [name]="'question-' + question.id"
-                 [value]="i"
-                 [checked]="selectedAnswers()[question.id] === i"
-                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-          <label [for]="'option-' + question.id + '-' + i" 
-                 class="ml-3 text-gray-700 cursor-pointer flex-1">
-            {{ option }}
-          </label>
+        <!-- Multiple Choice Questions -->
+        <div *ngIf="question.type === 'multiple-choice'" class="space-y-3">
+          <div *ngFor="let option of question.options; let i = index" 
+               class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer transition-colors"
+               [class.bg-blue-50]="selectedAnswers()[question.id] === i"
+               [class.border-blue-500]="selectedAnswers()[question.id] === i"
+               (click)="selectAnswer(question.id, i)">
+            <input type="radio" 
+                   [id]="'option-' + question.id + '-' + i"
+                   [name]="'question-' + question.id"
+                   [value]="i"
+                   [checked]="selectedAnswers()[question.id] === i"
+                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <label [for]="'option-' + question.id + '-' + i" 
+                   class="ml-3 text-gray-700 cursor-pointer flex-1">
+              {{ option }}
+            </label>
+          </div>
+        </div>
+
+        <!-- True/False Questions -->
+        <div *ngIf="question.type === 'true-false'" class="space-y-3">
+          <div class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer transition-colors"
+               [class.bg-blue-50]="selectedAnswers()[question.id] === 0"
+               [class.border-blue-500]="selectedAnswers()[question.id] === 0"
+               (click)="selectTrueFalse(question.id, true)">
+            <input type="radio" 
+                   [id]="'true-' + question.id"
+                   [name]="'question-' + question.id"
+                   [checked]="selectedAnswers()[question.id] === 0"
+                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <label [for]="'true-' + question.id" 
+                   class="ml-3 text-gray-700 cursor-pointer flex-1">
+              True
+            </label>
+          </div>
+          <div class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer transition-colors"
+               [class.bg-blue-50]="selectedAnswers()[question.id] === 1"
+               [class.border-blue-500]="selectedAnswers()[question.id] === 1"
+               (click)="selectTrueFalse(question.id, false)">
+            <input type="radio" 
+                   [id]="'false-' + question.id"
+                   [name]="'question-' + question.id"
+                   [checked]="selectedAnswers()[question.id] === 1"
+                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <label [for]="'false-' + question.id" 
+                   class="ml-3 text-gray-700 cursor-pointer flex-1">
+              False
+            </label>
+          </div>
+        </div>
+
+        <!-- Fill in the Blank Questions -->
+        <div *ngIf="question.type === 'fill-in-blank'" class="space-y-3">
+          <div class="p-4 border border-gray-200 rounded-lg">
+            <label [for]="'text-' + question.id" 
+                   class="block text-sm font-medium text-gray-700 mb-2">
+              Your Answer:
+            </label>
+            <input type="text" 
+                   [id]="'text-' + question.id"
+                   [value]="selectedAnswers()[question.id] || ''"
+                   (input)="onTextInput(question.id, $any($event.target).value)"
+                   class="form-input w-full"
+                   placeholder="Type your answer here...">
+          </div>
         </div>
       </div>
 

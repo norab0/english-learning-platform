@@ -43,4 +43,9 @@ export class AdminDashboardComponent {
       completionRate: Math.floor(Math.random() * 100) // Mock data
     }));
   });
+
+  // Helper method to get user initials
+  getInitials(name: string): string {
+    return name.split(' ').map(n => n[0]).join('');
+  }
 }

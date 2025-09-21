@@ -41,6 +41,7 @@ export class ExamsService {
       // Simulate API call
       await this.delay(500);
       // Data is already loaded in constructor
+      console.log('Exams loaded:', this._exams().length);
     } catch (error) {
       this._error.set('Failed to load exams');
     } finally {
@@ -128,14 +129,14 @@ export class ExamsService {
   }
 
   // New method for direct exam submission with answers
-  submitExamAttempt(examId: string, answers: { [questionId: string]: number }, score: number): void {
+  submitExamAttempt(examId: string, answers: { [questionId: string]: string | number }, score: number): void {
     const attempt: ExamAttempt = {
       id: Date.now().toString(),
       examId,
       userId: 'current-user', // This should come from auth service
-      answers: Object.entries(answers).map(([questionId, answerIndex]) => ({
+      answers: Object.entries(answers).map(([questionId, answerValue]) => ({
         questionId,
-        answer: answerIndex.toString(),
+        answer: answerValue.toString(),
         isCorrect: false // Will be calculated later
       })),
       score,
@@ -172,7 +173,9 @@ export class ExamsService {
   }
 
   private isAnswerCorrect(question: Question, answer: string | string[]): boolean {
-    if (question.type === 'multiple-choice' || question.type === 'true-false') {
+    if (question.type === 'multiple-choice') {
+      return answer === question.correctAnswer;
+    } else if (question.type === 'true-false') {
       return answer === question.correctAnswer;
     } else if (question.type === 'fill-in-blank') {
       const correctAnswers = Array.isArray(question.correctAnswer) 
@@ -216,6 +219,22 @@ export class ExamsService {
             type: 'fill-in-blank',
             correctAnswer: 'go',
             points: 10
+          },
+          {
+            id: 'q4',
+            text: 'Which is the correct plural of "child"?',
+            type: 'multiple-choice',
+            options: ['childs', 'children', 'childes', 'childrens'],
+            correctAnswer: 'children',
+            points: 10
+          },
+          {
+            id: 'q5',
+            text: 'What is the past tense of "go"?',
+            type: 'multiple-choice',
+            options: ['goed', 'went', 'gone', 'goes'],
+            correctAnswer: 'went',
+            points: 10
           }
         ],
         createdAt: new Date('2024-01-01'),
@@ -230,7 +249,7 @@ export class ExamsService {
         passingScore: 75,
         questions: [
           {
-            id: 'q4',
+            id: 'q6',
             text: 'Which phrase is more polite?',
             type: 'multiple-choice',
             options: ['Give me that', 'Could you please give me that?', 'I want that', 'That, now'],
@@ -238,15 +257,192 @@ export class ExamsService {
             points: 15
           },
           {
-            id: 'q5',
+            id: 'q7',
             text: 'In business English, it\'s appropriate to use slang.',
             type: 'true-false',
             correctAnswer: 'false',
+            points: 15
+          },
+          {
+            id: 'q8',
+            text: 'What does "I\'m running late" mean?',
+            type: 'multiple-choice',
+            options: ['I am jogging', 'I am behind schedule', 'I am running fast', 'I am tired'],
+            correctAnswer: 'I am behind schedule',
+            points: 15
+          },
+          {
+            id: 'q9',
+            text: 'Complete: "I would like to ___ a reservation for tonight."',
+            type: 'fill-in-blank',
+            correctAnswer: 'make',
             points: 15
           }
         ],
         createdAt: new Date('2024-01-15'),
         updatedAt: new Date('2024-01-15')
+      },
+      {
+        id: '3',
+        title: 'Advanced Grammar Test',
+        description: 'Test your advanced English grammar knowledge',
+        courseId: '3',
+        duration: 60,
+        passingScore: 80,
+        questions: [
+          {
+            id: 'q10',
+            text: 'Which sentence is correct?',
+            type: 'multiple-choice',
+            options: [
+              'If I would have known, I would have come',
+              'If I had known, I would have come',
+              'If I would know, I would come',
+              'If I know, I would come'
+            ],
+            correctAnswer: 'If I had known, I would have come',
+            points: 20
+          },
+          {
+            id: 'q11',
+            text: 'What is the correct form: "The book ___ I read yesterday was interesting."',
+            type: 'multiple-choice',
+            options: ['which', 'who', 'whom', 'whose'],
+            correctAnswer: 'which',
+            points: 20
+          },
+          {
+            id: 'q12',
+            text: 'Complete: "By the time we arrived, the meeting ___ already started."',
+            type: 'fill-in-blank',
+            correctAnswer: 'had',
+            points: 20
+          },
+          {
+            id: 'q13',
+            text: 'Which is the correct passive voice?',
+            type: 'multiple-choice',
+            options: [
+              'The letter was written by John',
+              'The letter was wrote by John',
+              'The letter was writing by John',
+              'The letter written by John'
+            ],
+            correctAnswer: 'The letter was written by John',
+            points: 20
+          }
+        ],
+        createdAt: new Date('2024-02-01'),
+        updatedAt: new Date('2024-02-01')
+      },
+      {
+        id: '4',
+        title: 'Business English Test',
+        description: 'Test your business English vocabulary and expressions',
+        courseId: '4',
+        duration: 40,
+        passingScore: 75,
+        questions: [
+          {
+            id: 'q14',
+            text: 'What does "deadline" mean in business context?',
+            type: 'multiple-choice',
+            options: [
+              'A line that is not alive',
+              'The final date for completing something',
+              'A type of meeting',
+              'A business strategy'
+            ],
+            correctAnswer: 'The final date for completing something',
+            points: 20
+          },
+          {
+            id: 'q15',
+            text: 'Which phrase is appropriate for a business email?',
+            type: 'multiple-choice',
+            options: [
+              'Hey, what\'s up?',
+              'Dear Sir/Madam',
+              'Yo, check this out',
+              'Sup dude'
+            ],
+            correctAnswer: 'Dear Sir/Madam',
+            points: 20
+          },
+          {
+            id: 'q16',
+            text: 'What does "to follow up" mean?',
+            type: 'multiple-choice',
+            options: [
+              'To walk behind someone',
+              'To continue or check on something later',
+              'To copy someone',
+              'To finish something'
+            ],
+            correctAnswer: 'To continue or check on something later',
+            points: 20
+          },
+          {
+            id: 'q17',
+            text: 'Complete: "I would like to ___ a meeting to discuss the project."',
+            type: 'fill-in-blank',
+            correctAnswer: 'schedule',
+            points: 20
+          }
+        ],
+        createdAt: new Date('2024-02-15'),
+        updatedAt: new Date('2024-02-15')
+      },
+      {
+        id: '5',
+        title: 'Vocabulary Test',
+        description: 'Test your English vocabulary knowledge',
+        courseId: '5',
+        duration: 35,
+        passingScore: 70,
+        questions: [
+          {
+            id: 'q18',
+            text: 'What is the opposite of "ancient"?',
+            type: 'multiple-choice',
+            options: ['old', 'modern', 'historic', 'traditional'],
+            correctAnswer: 'modern',
+            points: 15
+          },
+          {
+            id: 'q19',
+            text: 'What does "enormous" mean?',
+            type: 'multiple-choice',
+            options: ['very small', 'very large', 'very fast', 'very slow'],
+            correctAnswer: 'very large',
+            points: 15
+          },
+          {
+            id: 'q20',
+            text: 'Which word means "to make something better"?',
+            type: 'multiple-choice',
+            options: ['improve', 'worsen', 'destroy', 'ignore'],
+            correctAnswer: 'improve',
+            points: 15
+          },
+          {
+            id: 'q21',
+            text: 'What is a synonym for "beautiful"?',
+            type: 'multiple-choice',
+            options: ['ugly', 'pretty', 'strange', 'boring'],
+            correctAnswer: 'pretty',
+            points: 15
+          },
+          {
+            id: 'q22',
+            text: 'Complete: "The weather is ___ today, perfect for a picnic."',
+            type: 'fill-in-blank',
+            correctAnswer: 'sunny',
+            points: 15
+          }
+        ],
+        createdAt: new Date('2024-03-01'),
+        updatedAt: new Date('2024-03-01')
       }
     ];
 
