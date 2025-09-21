@@ -21,7 +21,7 @@ interface Question {
 })
 export class ExamTakeComponent implements OnInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  public router = inject(Router);
   private examsService = inject(ExamsService);
   private authService = inject(AuthService);
 
