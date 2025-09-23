@@ -1,51 +1,105 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../auth/services/auth';
-import { CoursesService } from '../../../courses/services/courses';
-import { ExamsService } from '../../../exams/services/exams';
+import { FormsModule } from '@angular/forms';
+import { UsersService } from '../../../../core/services/users.service';
+import { ScoresService } from '../../../../core/services/scores.service';
+import { User } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.scss'
 })
-export class AdminDashboardComponent {
-  private authService = inject(AuthService);
-  private coursesService = inject(CoursesService);
-  private examsService = inject(ExamsService);
+export class AdminDashboardComponent implements OnInit {
+  private usersService = inject(UsersService);
+  private scoresService = inject(ScoresService);
 
-  // Mock users data (in real app, this would come from a service)
-  users = [
-    { id: '1', name: 'John Doe', email: 'john@example.com', role: 'user', coursesEnrolled: 3, lastLogin: new Date() },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'user', coursesEnrolled: 2, lastLogin: new Date() },
-    { id: '3', name: 'Admin User', email: 'admin@test.com', role: 'admin', coursesEnrolled: 0, lastLogin: new Date() }
-  ];
+  // Signals
+  users = computed(() => this.usersService.users());
+  totalUsers = computed(() => this.usersService.totalUsers());
+  adminUsers = computed(() => this.usersService.adminUsers());
+  regularUsers = computed(() => this.usersService.regularUsers());
 
-  // Computed statistics
-  totalUsers = computed(() => this.users.length);
-  totalCourses = computed(() => this.coursesService.courses().length);
-  totalExams = computed(() => this.examsService.exams().length);
-  averageScore = computed(() => this.examsService.averageScore());
+  scores = computed(() => this.scoresService.scores());
+  totalScores = computed(() => this.scoresService.totalScores());
+  averageScore = computed(() => this.scoresService.averageScore());
 
-  // Get recent exam attempts
-  recentAttempts = computed(() => {
-    return this.examsService.attempts().slice(-5).reverse();
+  // Local state
+  showAddUser = signal(false);
+
+  // New user form
+  newUser = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    role: 'user' as 'user' | 'admin'
+  };
+
+  // Computed signals
+  recentScores = computed(() => {
+    return [...this.scores()]
+      .sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime())
+      .slice(0, 5);
   });
 
-  // Get course statistics
-  courseStats = computed(() => {
-    return this.coursesService.courses().map(course => ({
-      course,
-      enrolledUsers: this.users.filter(user => user.coursesEnrolled > 0).length,
-      completionRate: Math.floor(Math.random() * 100) // Mock data
-    }));
+  topPerformers = computed(() => {
+    return [...this.scores()]
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 3);
   });
 
-  // Helper method to get user initials
-  getInitials(name: string): string {
-    return name.split(' ').map(n => n[0]).join('');
+  ngOnInit(): void {
+    this.usersService.loadUsers();
+  }
+
+  async addUser(): Promise<void> {
+    try {
+      await this.usersService.createUser({
+        firstName: this.newUser.firstName,
+        lastName: this.newUser.lastName,
+        email: this.newUser.email,
+        role: this.newUser.role
+      });
+      this.resetNewUserForm();
+      this.showAddUser.set(false);
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+  }
+
+  async toggleUserRole(user: User): Promise<void> {
+    const newRole = user.role === 'admin' ? 'user' : 'admin';
+    await this.usersService.updateUserRole(user.id, newRole);
+  }
+
+  async deleteUser(user: User): Promise<void> {
+    if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
+      await this.usersService.deleteUser(user.id);
+    }
+  }
+
+  getRoleBadgeClass(role: string): string {
+    return role === 'admin' 
+      ? 'bg-purple-100 text-purple-800' 
+      : 'bg-blue-100 text-blue-800';
+  }
+
+  getScoreColor(percentage: number): string {
+    if (percentage >= 80) return 'text-green-600';
+    if (percentage >= 70) return 'text-yellow-600';
+    return 'text-red-600';
+  }
+
+  private resetNewUserForm(): void {
+    this.newUser = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      role: 'user'
+    };
   }
 }

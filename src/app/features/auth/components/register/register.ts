@@ -17,7 +17,7 @@ export class RegisterComponent {
 
   // Computed signals
   public readonly isSubmitting = this._isSubmitting.asReadonly();
-  public readonly isFormValid = computed(() => this.registerForm.valid && !this._isSubmitting());
+  public readonly isFormValid = computed(() => this.registerForm.valid);
 
   constructor(
     private fb: FormBuilder,
@@ -46,6 +46,10 @@ export class RegisterComponent {
   }
 
   async onSubmit(): Promise<void> {
+    console.log('Form valid:', this.registerForm.valid);
+    console.log('Form errors:', this.registerForm.errors);
+    console.log('Form value:', this.registerForm.value);
+    
     if (this.registerForm.valid) {
       this._isSubmitting.set(true);
       
@@ -58,6 +62,8 @@ export class RegisterComponent {
         role: formValue.role
       };
       
+      console.log('Submitting user data:', userData);
+      
       const success = await this.authService.register(userData);
       
       if (success) {
@@ -65,12 +71,18 @@ export class RegisterComponent {
       }
       
       this._isSubmitting.set(false);
+    } else {
+      console.log('Form is invalid, cannot submit');
+      // Mark all fields as touched to show validation errors
+      Object.keys(this.registerForm.controls).forEach(key => {
+        this.registerForm.get(key)?.markAsTouched();
+      });
     }
   }
 
   getErrorMessage(fieldName: string): string {
     const field = this.registerForm.get(fieldName);
-    if (field?.errors && field.touched) {
+    if (field?.errors && (field.touched || field.dirty)) {
       if (field.errors['required']) {
         return `${fieldName} is required`;
       }
@@ -85,5 +97,28 @@ export class RegisterComponent {
       }
     }
     return '';
+  }
+
+  async testRegister(): Promise<void> {
+    console.log('Testing register with admin account...');
+    
+    const userData = {
+      firstName: 'Test',
+      lastName: 'Admin',
+      email: 'test@admin.com',
+      password: 'test123',
+      role: 'admin' as 'user' | 'admin'
+    };
+    
+    console.log('Submitting test user data:', userData);
+    
+    const success = await this.authService.register(userData);
+    
+    if (success) {
+      console.log('Test registration successful!');
+      this.router.navigate(['/courses']);
+    } else {
+      console.log('Test registration failed');
+    }
   }
 }

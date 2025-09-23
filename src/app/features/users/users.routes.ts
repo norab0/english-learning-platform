@@ -12,10 +12,5 @@ export const usersRoutes: Routes = [
     path: 'admin-dashboard',
     loadComponent: () => import('./components/admin-dashboard/admin-dashboard').then(m => m.AdminDashboardComponent),
     canActivate: [authGuard, adminGuard]
-  },
-  {
-    path: 'scores-dashboard',
-    loadComponent: () => import('./components/scores-dashboard/scores-dashboard').then(m => m.ScoresDashboardComponent),
-    canActivate: [authGuard, adminGuard]
   }
 ];

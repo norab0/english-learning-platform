@@ -37,11 +37,7 @@
           </a>
             <a *ngIf="isAdmin()" routerLink="/users/admin-dashboard" routerLinkActive="text-blue-600"
                class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-              Admin Dashboard
-            </a>
-            <a *ngIf="isAdmin()" routerLink="/users/scores-dashboard" routerLinkActive="text-blue-600"
-               class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-              Scores
+              Dashboard
             </a>
         </ng-container>
       </div>
@@ -110,11 +106,7 @@
         </a>
           <a *ngIf="isAdmin()" routerLink="/users/admin-dashboard" (click)="closeMenu()"
              class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
-            Admin Dashboard
-          </a>
-          <a *ngIf="isAdmin()" routerLink="/users/scores-dashboard" (click)="closeMenu()"
-             class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
-            Scores
+            Dashboard
           </a>
         <div class="border-t border-gray-200 pt-4">
           <div class="px-3 py-2 text-sm text-gray-600">
