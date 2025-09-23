@@ -1,6 +1,8 @@
 /* Header Component Styles */
 nav {
-  transition: box-shadow 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* Navigation links */

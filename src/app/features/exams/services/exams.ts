@@ -1,15 +1,20 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Exam, Question, ExamAttempt, Answer } from '../../../core/models/exam.model';
+import { ScoresService } from '../../../core/services/scores.service';
+import { AuthService } from '../../auth/services/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExamsService {
-  // Signals
-  private _exams = signal<Exam[]>([]);
-  private _attempts = signal<ExamAttempt[]>([]);
-  private _isLoading = signal<boolean>(false);
-  private _error = signal<string | null>(null);
+    private scoresService = inject(ScoresService);
+    private authService = inject(AuthService);
+
+    // Signals
+    private _exams = signal<Exam[]>([]);
+    private _attempts = signal<ExamAttempt[]>([]);
+    private _isLoading = signal<boolean>(false);
+    private _error = signal<string | null>(null);
 
   // Computed signals
   public readonly exams = this._exams.asReadonly();
@@ -128,24 +133,38 @@ export class ExamsService {
     return score;
   }
 
-  // New method for direct exam submission with answers
-  submitExamAttempt(examId: string, answers: { [questionId: string]: string | number }, score: number): void {
-    const attempt: ExamAttempt = {
-      id: Date.now().toString(),
-      examId,
-      userId: 'current-user', // This should come from auth service
-      answers: Object.entries(answers).map(([questionId, answerValue]) => ({
-        questionId,
-        answer: answerValue.toString(),
-        isCorrect: false // Will be calculated later
-      })),
-      score,
-      startedAt: new Date(),
-      completedAt: new Date()
-    };
+    // New method for direct exam submission with answers
+    submitExamAttempt(examId: string, answers: { [questionId: string]: string | number }, score: number): void {
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) return;
 
-    this._attempts.update(attempts => [...attempts, attempt]);
-  }
+      const attempt: ExamAttempt = {
+        id: Date.now().toString(),
+        examId,
+        userId: currentUser.id,
+        answers: Object.entries(answers).map(([questionId, answerValue]) => ({
+          questionId,
+          answer: answerValue.toString(),
+          isCorrect: false // Will be calculated later
+        })),
+        score,
+        startedAt: new Date(),
+        completedAt: new Date()
+      };
+
+      this._attempts.update(attempts => [...attempts, attempt]);
+
+      // Add score to scores service
+      const exam = this.getExamById(examId);
+      if (exam) {
+        this.scoresService.addScore(
+          attempt,
+          exam.title,
+          `${currentUser.firstName} ${currentUser.lastName}`,
+          currentUser.email
+        );
+      }
+    }
 
   // Get user's exam attempts
   getUserAttempts(userId: string): ExamAttempt[] {
