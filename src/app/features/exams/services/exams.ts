@@ -191,17 +191,21 @@ export class ExamsService {
     return { totalAttempts, averageScore, passRate };
   }
 
-  private isAnswerCorrect(question: Question, answer: string | string[]): boolean {
+  private isAnswerCorrect(question: Question, answer: string | string[] | number): boolean {
     if (question.type === 'multiple-choice') {
-      return answer === question.correctAnswer;
+      if (typeof question.correctAnswer === 'number') {
+        return answer === question.correctAnswer;
+      } else {
+        return answer === (question.correctAnswer as string);
+      }
     } else if (question.type === 'true-false') {
-      return answer === question.correctAnswer;
+      return answer === (question.correctAnswer as string);
     } else if (question.type === 'fill-in-blank') {
       const correctAnswers = Array.isArray(question.correctAnswer) 
         ? question.correctAnswer 
-        : [question.correctAnswer];
-      return correctAnswers.some(correct => 
-        correct.toLowerCase().trim() === (answer as string).toLowerCase().trim()
+        : [question.correctAnswer as string];
+      return correctAnswers.some((correct: string | number) => 
+        String(correct).toLowerCase().trim() === String(answer).toLowerCase().trim()
       );
     }
     return false;
@@ -222,7 +226,7 @@ export class ExamsService {
             text: 'What is the correct form of "to be" for "I"?',
             type: 'multiple-choice',
             options: ['am', 'is', 'are', 'be'],
-            correctAnswer: 'am',
+            correctAnswer: 0, // Index de 'am' dans le tableau
             points: 10
           },
           {
@@ -244,7 +248,7 @@ export class ExamsService {
             text: 'Which is the correct plural of "child"?',
             type: 'multiple-choice',
             options: ['childs', 'children', 'childes', 'childrens'],
-            correctAnswer: 'children',
+            correctAnswer: 1, // Index de 'children' dans le tableau
             points: 10
           },
           {
@@ -252,7 +256,7 @@ export class ExamsService {
             text: 'What is the past tense of "go"?',
             type: 'multiple-choice',
             options: ['goed', 'went', 'gone', 'goes'],
-            correctAnswer: 'went',
+            correctAnswer: 1, // Index de 'went' dans le tableau
             points: 10
           }
         ],
@@ -272,7 +276,7 @@ export class ExamsService {
             text: 'Which phrase is more polite?',
             type: 'multiple-choice',
             options: ['Give me that', 'Could you please give me that?', 'I want that', 'That, now'],
-            correctAnswer: 'Could you please give me that?',
+            correctAnswer: 1, // Index de 'Could you please give me that?' dans le tableau
             points: 15
           },
           {
@@ -287,7 +291,7 @@ export class ExamsService {
             text: 'What does "I\'m running late" mean?',
             type: 'multiple-choice',
             options: ['I am jogging', 'I am behind schedule', 'I am running fast', 'I am tired'],
-            correctAnswer: 'I am behind schedule',
+            correctAnswer: 1, // Index de 'I am behind schedule' dans le tableau
             points: 15
           },
           {

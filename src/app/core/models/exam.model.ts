@@ -15,7 +15,7 @@ export interface Question {
   text: string;
   type: 'multiple-choice' | 'true-false' | 'fill-in-blank';
   options?: string[];
-  correctAnswer: string | string[];
+  correctAnswer: string | string[] | number;
   points: number;
 }
 

@@ -111,18 +111,37 @@ export class ExamTakeComponent implements OnInit {
       const userAnswer = answers[question.id];
       let isCorrect = false;
 
+      console.log(`Question ${question.id}:`, {
+        type: question.type,
+        userAnswer,
+        correctAnswer: question.correctAnswer,
+        question: question.text
+      });
+
       if (question.type === 'multiple-choice') {
-        isCorrect = userAnswer === question.correctAnswer;
+        // Pour les questions à choix multiples, comparer l'index
+        if (typeof question.correctAnswer === 'number') {
+          isCorrect = userAnswer === question.correctAnswer;
+        } else {
+          // Fallback pour l'ancien format string
+          const correctIndex = question.options?.indexOf(question.correctAnswer as string);
+          isCorrect = userAnswer === correctIndex;
+        }
+        console.log(`Multiple choice: userAnswer=${userAnswer}, correctAnswer=${question.correctAnswer}, isCorrect=${isCorrect}`);
       } else if (question.type === 'true-false') {
+        // Pour les questions vrai/faux, 0 = true, 1 = false
         const correctIndex = question.correctAnswer === 'true' ? 0 : 1;
         isCorrect = userAnswer === correctIndex;
+        console.log(`True/False: userAnswer=${userAnswer}, correctIndex=${correctIndex}, isCorrect=${isCorrect}`);
       } else if (question.type === 'fill-in-blank') {
+        // Pour les questions à compléter
         const correctAnswers = Array.isArray(question.correctAnswer) 
           ? question.correctAnswer 
-          : [question.correctAnswer];
-        isCorrect = correctAnswers.some((correct: string) => 
-          correct.toLowerCase().trim() === String(userAnswer || '').toLowerCase().trim()
+          : [question.correctAnswer as string];
+        isCorrect = correctAnswers.some((correct: string | number) => 
+          String(correct).toLowerCase().trim() === String(userAnswer || '').toLowerCase().trim()
         );
+        console.log(`Fill-in-blank: userAnswer="${userAnswer}", correctAnswers=${correctAnswers}, isCorrect=${isCorrect}`);
       }
 
       if (isCorrect) {
@@ -131,6 +150,14 @@ export class ExamTakeComponent implements OnInit {
     });
 
     const score = Math.round((correctAnswers / exam.questions.length) * 100);
+    
+    console.log('Exam scoring results:', {
+      totalQuestions: exam.questions.length,
+      correctAnswers,
+      score,
+      answers
+    });
+    
     this.score.set(score);
     this.isSubmitted.set(true);
     this.stopTimer();

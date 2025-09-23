@@ -71,9 +71,20 @@
 
         <!-- Exam Stats (if authenticated) -->
         <div *ngIf="isAuthenticated()" class="mt-4 pt-4 border-t border-gray-200">
-          <div class="flex items-center justify-between text-sm text-gray-500">
-            <span>Your Best Score:</span>
-            <span class="font-medium text-gray-900">Not attempted</span>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-500">Your Best Score:</span>
+            <div *ngIf="getUserBestScore(exam.id); let bestScore" class="flex items-center space-x-2">
+              <span class="font-bold text-lg" [class]="getScoreColor(bestScore)">
+                {{ bestScore }}%
+              </span>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                    [class]="getScoreBadgeClass(bestScore)">
+                {{ bestScore >= 70 ? 'Passed' : 'Failed' }}
+              </span>
+            </div>
+            <div *ngIf="!getUserBestScore(exam.id)" class="text-gray-500">
+              Not attempted
+            </div>
           </div>
         </div>
       </div>
