@@ -81,7 +81,9 @@ export class ExamsService {
     return this._attempts().find(attempt => attempt.id === attemptId);
   }
 
-  async submitAnswer(attemptId: string, questionId: string, answer: string | string[]): Promise<void> {
+  async submitAnswer(attemptId: string, questionId: string, answer: string | string[] | number): Promise<void> {
+    console.log('Submitting answer:', { attemptId, questionId, answer });
+    
     this._attempts.update(attempts => 
       attempts.map(attempt => {
         if (attempt.id === attemptId) {
@@ -93,6 +95,8 @@ export class ExamsService {
           } else {
             attempt.answers.push(newAnswer);
           }
+          
+          console.log('Updated attempt answers:', attempt.answers);
         }
         return attempt;
       })
@@ -197,21 +201,33 @@ export class ExamsService {
   }
 
   private isAnswerCorrect(question: Question, answer: string | string[] | number): boolean {
+    console.log('Checking answer:', { 
+      questionId: question.id, 
+      questionType: question.type, 
+      userAnswer: answer, 
+      correctAnswer: question.correctAnswer 
+    });
+
     if (question.type === 'multiple-choice') {
-      if (typeof question.correctAnswer === 'number') {
-        return answer === question.correctAnswer;
-      } else {
-        return answer === (question.correctAnswer as string);
-      }
+      // For multiple choice, correctAnswer is the index (number)
+      const userAnswerIndex = typeof answer === 'number' ? answer : parseInt(String(answer));
+      const correctIndex = typeof question.correctAnswer === 'number' ? question.correctAnswer : parseInt(String(question.correctAnswer));
+      const isCorrect = userAnswerIndex === correctIndex;
+      console.log('Multiple choice result:', { userAnswerIndex, correctIndex, isCorrect });
+      return isCorrect;
     } else if (question.type === 'true-false') {
-      return answer === (question.correctAnswer as string);
+      const isCorrect = String(answer).toLowerCase() === String(question.correctAnswer).toLowerCase();
+      console.log('True/false result:', { userAnswer: answer, correctAnswer: question.correctAnswer, isCorrect });
+      return isCorrect;
     } else if (question.type === 'fill-in-blank') {
       const correctAnswers = Array.isArray(question.correctAnswer) 
         ? question.correctAnswer 
         : [question.correctAnswer as string];
-      return correctAnswers.some((correct: string | number) => 
+      const isCorrect = correctAnswers.some((correct: string | number) => 
         String(correct).toLowerCase().trim() === String(answer).toLowerCase().trim()
       );
+      console.log('Fill-in-blank result:', { userAnswer: answer, correctAnswers, isCorrect });
+      return isCorrect;
     }
     return false;
   }

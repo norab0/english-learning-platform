@@ -159,8 +159,21 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     if (!attempt || !currentQuestion) return;
 
     const answer = this.examForm.get(`question_${this._currentQuestionIndex()}`)?.value;
-    if (answer) {
-      this.examsService.submitAnswer(attempt.id, currentQuestion.id, answer);
+    if (answer !== null && answer !== undefined) {
+      // Convert string numbers to actual numbers for multiple choice questions
+      let processedAnswer = answer;
+      if (currentQuestion.type === 'multiple-choice' && typeof answer === 'string') {
+        processedAnswer = parseInt(answer, 10);
+      }
+      
+      console.log('Saving answer:', { 
+        questionId: currentQuestion.id, 
+        questionType: currentQuestion.type, 
+        originalAnswer: answer, 
+        processedAnswer 
+      });
+      
+      this.examsService.submitAnswer(attempt.id, currentQuestion.id, processedAnswer);
     }
   }
 
@@ -173,6 +186,9 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
       if (attempt) {
         // Save all answers before submitting
         this.saveAnswer();
+        
+        // Wait a bit to ensure all answers are saved
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         const score = await this.examsService.submitExam(attempt.id);
         console.log('Exam submitted with score:', score);

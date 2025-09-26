@@ -32,6 +32,6 @@ export interface ExamAttempt {
 
 export interface Answer {
   questionId: string;
-  answer: string | string[];
+  answer: string | string[] | number;
   isCorrect?: boolean;
 }
