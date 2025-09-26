@@ -114,21 +114,45 @@ export class ExamsService {
       throw new Error('Exam not found');
     }
 
+    console.log('=== EXAM SUBMISSION DEBUG ===');
+    console.log('Exam:', exam.title);
+    console.log('Total questions:', exam.questions.length);
+    console.log('User answers:', attempt.answers);
+
     // Calculate score
     let correctAnswers = 0;
     const totalQuestions = exam.questions.length;
 
-    attempt.answers.forEach(answer => {
+    attempt.answers.forEach((answer, index) => {
       const question = exam.questions.find(q => q.id === answer.questionId);
-      if (question && this.isAnswerCorrect(question, answer.answer)) {
-        correctAnswers++;
-        answer.isCorrect = true;
+      console.log(`\n--- Question ${index + 1} ---`);
+      console.log('Question ID:', answer.questionId);
+      console.log('Question:', question?.text);
+      console.log('Question type:', question?.type);
+      console.log('User answer:', answer.answer, typeof answer.answer);
+      console.log('Correct answer:', question?.correctAnswer, typeof question?.correctAnswer);
+      
+      if (question) {
+        const isCorrect = this.isAnswerCorrect(question, answer.answer);
+        console.log('Is correct:', isCorrect);
+        
+        if (isCorrect) {
+          correctAnswers++;
+          answer.isCorrect = true;
+        } else {
+          answer.isCorrect = false;
+        }
       } else {
+        console.log('Question not found!');
         answer.isCorrect = false;
       }
     });
 
     const score = Math.round((correctAnswers / totalQuestions) * 100);
+    console.log('\n=== SCORING RESULT ===');
+    console.log('Correct answers:', correctAnswers);
+    console.log('Total questions:', totalQuestions);
+    console.log('Score:', score + '%');
 
     // Update attempt with score and completion
     this._attempts.update(attempts => 

@@ -114,6 +114,26 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     if (currentUser) {
       this.examsService.startExam(exam.id, currentUser.id).then(attempt => {
         this._attempt.set(attempt);
+        console.log('New attempt created:', attempt);
+        
+        // Load existing answers if any
+        this.loadExistingAnswers(attempt);
+      });
+    }
+  }
+
+  private loadExistingAnswers(attempt: any): void {
+    if (attempt && attempt.answers && attempt.answers.length > 0) {
+      console.log('Loading existing answers:', attempt.answers);
+      attempt.answers.forEach((answer: any) => {
+        const questionIndex = this.exam()?.questions.findIndex(q => q.id === answer.questionId);
+        if (questionIndex !== undefined && questionIndex >= 0) {
+          const formControl = this.examForm.get(`question_${questionIndex}`);
+          if (formControl) {
+            formControl.setValue(answer.answer);
+            console.log(`Loaded answer for question ${questionIndex}:`, answer.answer);
+          }
+        }
       });
     }
   }
@@ -185,10 +205,11 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
       const attempt = this._attempt();
       if (attempt) {
         // Save all answers before submitting
-        this.saveAnswer();
+        console.log('Saving all answers before submission...');
+        this.saveAllAnswers();
         
         // Wait a bit to ensure all answers are saved
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         const score = await this.examsService.submitExam(attempt.id);
         console.log('Exam submitted with score:', score);
@@ -202,6 +223,27 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     } finally {
       this._isSubmitting.set(false);
     }
+  }
+
+  private saveAllAnswers(): void {
+    const attempt = this._attempt();
+    const exam = this.exam();
+    if (!attempt || !exam) return;
+
+    console.log('Saving all answers...');
+    exam.questions.forEach((question, index) => {
+      const answer = this.examForm.get(`question_${index}`)?.value;
+      if (answer !== null && answer !== undefined && answer !== '') {
+        // Convert string numbers to actual numbers for multiple choice questions
+        let processedAnswer = answer;
+        if (question.type === 'multiple-choice' && typeof answer === 'string') {
+          processedAnswer = parseInt(answer, 10);
+        }
+        
+        console.log(`Saving answer for question ${index + 1} (${question.id}):`, processedAnswer);
+        this.examsService.submitAnswer(attempt.id, question.id, processedAnswer);
+      }
+    });
   }
 
   formatTime(seconds: number): string {
