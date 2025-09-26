@@ -1,0 +1,71 @@
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div class="card">
+      <div>
+        <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
+          Welcome back!
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          Sign in to continue your English learning journey
+        </p>
+        <p class="mt-1 text-center text-sm text-gray-500">
+          Don't have an account?
+          <a routerLink="/auth/register" class="font-medium text-blue-600 hover:text-blue-500">
+            Create one here
+          </a>
+        </p>
+        <div class="mt-4 text-center text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">
+          <p><strong>Demo:</strong> admin@test.com / admin123</p>
+          <p><strong>Demo:</strong> user@test.com / user123</p>
+        </div>
+      </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <div class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input mt-1"
+            placeholder="Enter your email"
+          />
+          <div *ngIf="getErrorMessage('email')" class="form-error">
+            {{ getErrorMessage('email') }}
+          </div>
+        </div>
+        
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-input mt-1"
+            placeholder="Enter your password"
+          />
+          <div *ngIf="getErrorMessage('password')" class="form-error">
+            {{ getErrorMessage('password') }}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="authService.error()" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+        {{ authService.error() }}
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          class="btn-primary w-full flex justify-center py-2 px-4"
+        >
+          <div *ngIf="isSubmitting()" class="spinner mr-2"></div>
+          {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
+        </button>
+        
+      </div>
+    </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: 'user' | 'admin';
+  token: string;
+  createdAt: Date;
+  lastLogin?: Date;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role?: 'user' | 'admin';
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}

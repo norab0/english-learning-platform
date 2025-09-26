@@ -1,0 +1,44 @@
+/* Profile Component Styles */
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress bar animation */
+.bg-blue-600 {
+  transition: width 0.5s ease-in-out;
+}
+
+/* User avatar */
+.w-16.h-16 {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+/* Role badge */
+.bg-purple-100 {
+  background-color: #f3e8ff;
+}
+
+.bg-green-100 {
+  background-color: #dcfce7;
+}
+
+/* Course progress items */
+.border-gray-200 {
+  transition: border-color 0.2s ease-in-out;
+}
+
+.border-gray-200:hover {
+  border-color: #3b82f6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-cols-1.md\\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}

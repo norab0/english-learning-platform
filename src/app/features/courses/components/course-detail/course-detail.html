@@ -1,0 +1,65 @@
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8" *ngIf="course() as c">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">{{ c.title }}</h1>
+    <p class="text-gray-600">{{ c.description }}</p>
+  </div>
+
+  <div class="progress-bar mb-4">
+    <div class="progress-fill" [style.width]="progressPercent + '%'"></div>
+  </div>
+
+  <div class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div class="text-sm text-gray-500">Leçon {{ currentIndex() + 1 }} / {{ c.lessons.length }}</div>
+    </div>
+    <div *ngIf="currentLesson() as lesson">
+      <h2 class="text-xl font-semibold mb-2">{{ lesson.title }}</h2>
+      <div class="prose max-w-none whitespace-pre-line">{{ lesson.content }}</div>
+    </div>
+
+    <div class="flex items-center justify-between mt-6">
+      <button class="btn-secondary" (click)="prev()" [disabled]="currentIndex() === 0">Précédent</button>
+      <button class="btn-primary" (click)="next()">Suivant</button>
+    </div>
+  </div>
+
+  <div class="mt-4 p-4 bg-green-50 text-green-800 border border-green-200 rounded" *ngIf="currentIndex() > 0">
+    Bravo 🎉 tu as terminé la leçon {{ currentIndex() }}/{{ c.lessons.length }} !
+  </div>
+</div>
+
+<details class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+  <summary class="cursor-pointer text-gray-800 font-medium">Afficher/Masquer la liste des leçons</summary>
+  <div class="mt-4">
+    <ng-container *ngIf="course(); else notFound">
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between mb-2">
+          <h1 class="text-2xl font-bold">{{ course()!.title }}</h1>
+          <span class="text-sm text-gray-600">Progression: {{ progressPercent }}%</span>
+        </div>
+        <p class="text-gray-600 mb-4">{{ course()!.description }}</p>
+
+        <h2 class="text-lg font-semibold mb-3">Leçons</h2>
+        <ol class="space-y-3">
+          <li *ngFor="let lesson of course()!.lessons" class="p-4 border border-gray-200 rounded-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium">{{ lesson.order }}. {{ lesson.title }}</div>
+                <div class="text-sm text-gray-600">Durée: {{ lesson.duration }} min</div>
+              </div>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" [checked]="isCompleted(lesson.id)" (change)="toggle(lesson.id)" />
+                <span class="text-sm">Terminée</span>
+              </label>
+            </div>
+            <p class="mt-2 text-gray-700">{{ lesson.content }}</p>
+          </li>
+        </ol>
+      </div>
+    </ng-container>
+
+    <ng-template #notFound>
+      <div class="text-center text-gray-600">Cours introuvable.</div>
+    </ng-template>
+  </div>
+</details>

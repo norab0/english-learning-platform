@@ -1,0 +1,53 @@
+/* Course Detail Component Styles */
+.progress-bar {
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background-color: #2563eb;
+  height: 100%;
+  transition: width 500ms ease-in-out;
+}
+
+.prose {
+  line-height: 1.7;
+}
+
+.prose h2 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+}
+
+details summary {
+  list-style: none;
+  padding: 0.75rem 1rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  transition: background-color 200ms;
+}
+
+details summary:hover {
+  background-color: #e5e7eb;
+}
+
+details[open] summary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+details[open] > div {
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  padding: 1rem;
+  background-color: #ffffff;
+}
