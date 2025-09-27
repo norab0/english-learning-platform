@@ -1,10 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ExamsService } from '../../../exams/services/exams';
 import { CoursesService } from '../../../courses/services/courses';
 import { Exam, Question } from '../../../../core/models/exam.model';
+import { Course } from '../../../../core/models/course.model';
 
 @Component({
   selector: 'app-exam-management',
@@ -147,7 +148,7 @@ export class ExamManagementComponent {
       
       try {
         const formValue = this.examForm.value;
-        const questions: Question[] = formValue.questions.map((q: { text: string; type: string; points: number; correctAnswer: string; options?: string[] }, index: number) => {
+        const questions: Question[] = formValue.questions.map((q: { text: string; type: 'multiple-choice' | 'true-false' | 'fill-in-blank'; points: number; correctAnswer: string; options?: string[] }, index: number) => {
           const processedQuestion: Question = {
             id: `q${index + 1}`,
             text: q.text,
@@ -157,7 +158,7 @@ export class ExamManagementComponent {
           };
 
           if (q.type === 'multiple-choice') {
-            processedQuestion.options = q.options.filter((opt: string) => opt.trim() !== '');
+            processedQuestion.options = q.options?.filter((opt: string) => opt.trim() !== '') || [];
             processedQuestion.correctAnswer = parseInt(q.correctAnswer);
           } else if (q.type === 'true-false') {
             processedQuestion.correctAnswer = q.correctAnswer === 'true' ? 'true' : 'false';

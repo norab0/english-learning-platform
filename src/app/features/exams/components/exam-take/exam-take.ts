@@ -38,7 +38,7 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
 
   // Form
   examForm: FormGroup;
-  private timer: NodeJS.Timeout | null = null;
+  private timer: number | null = null;
 
   // Public properties for template
   Math = Math;
