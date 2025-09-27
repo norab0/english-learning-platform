@@ -77,8 +77,7 @@ export class ExamResultsComponent {
       } else {
         this.router.navigate(['/exams']);
       }
-    } catch (error) {
-      console.error('Error loading exam results:', error);
+    } catch {
       this.router.navigate(['/exams']);
     } finally {
       this._isLoading.set(false);

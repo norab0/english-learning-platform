@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { AuthService } from './features/auth/services/auth';
@@ -11,11 +11,7 @@ import { HeaderComponent } from './shared/components/header/header';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'English Learning Platform';
   authService = inject(AuthService);
-
-  ngOnInit(): void {
-    // Initialize auth state
-  }
 }

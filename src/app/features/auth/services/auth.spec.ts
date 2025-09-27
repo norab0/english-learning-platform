@@ -65,6 +65,6 @@ describe('AuthService', () => {
     
     expect(service.isAuthenticated()).toBe(false);
     expect(service.currentUser()).toBeNull();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
   });
 });

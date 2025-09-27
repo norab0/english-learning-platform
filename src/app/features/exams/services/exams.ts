@@ -47,8 +47,7 @@ export class ExamsService {
       // Simulate API call
       await this.delay(500);
       // Data is already loaded in constructor
-      console.log('Exams loaded:', this._exams().length);
-    } catch (error) {
+    } catch {
       this._error.set('Failed to load exams');
     } finally {
       this._isLoading.set(false);
@@ -82,7 +81,6 @@ export class ExamsService {
   }
 
   async submitAnswer(attemptId: string, questionId: string, answer: string | string[] | number): Promise<void> {
-    console.log('Submitting answer:', { attemptId, questionId, answer });
     
     this._attempts.update(attempts => 
       attempts.map(attempt => {
@@ -96,7 +94,6 @@ export class ExamsService {
             attempt.answers.push(newAnswer);
           }
           
-          console.log('Updated attempt answers:', attempt.answers);
         }
         return attempt;
       })
@@ -114,27 +111,16 @@ export class ExamsService {
       throw new Error('Exam not found');
     }
 
-    console.log('=== EXAM SUBMISSION DEBUG ===');
-    console.log('Exam:', exam.title);
-    console.log('Total questions:', exam.questions.length);
-    console.log('User answers:', attempt.answers);
 
     // Calculate score
     let correctAnswers = 0;
     const totalQuestions = exam.questions.length;
 
-    attempt.answers.forEach((answer, index) => {
+    attempt.answers.forEach((answer) => {
       const question = exam.questions.find(q => q.id === answer.questionId);
-      console.log(`\n--- Question ${index + 1} ---`);
-      console.log('Question ID:', answer.questionId);
-      console.log('Question:', question?.text);
-      console.log('Question type:', question?.type);
-      console.log('User answer:', answer.answer, typeof answer.answer);
-      console.log('Correct answer:', question?.correctAnswer, typeof question?.correctAnswer);
       
       if (question) {
         const isCorrect = this.isAnswerCorrect(question, answer.answer);
-        console.log('Is correct:', isCorrect);
         
         if (isCorrect) {
           correctAnswers++;
@@ -143,16 +129,11 @@ export class ExamsService {
           answer.isCorrect = false;
         }
       } else {
-        console.log('Question not found!');
         answer.isCorrect = false;
       }
     });
 
     const score = Math.round((correctAnswers / totalQuestions) * 100);
-    console.log('\n=== SCORING RESULT ===');
-    console.log('Correct answers:', correctAnswers);
-    console.log('Total questions:', totalQuestions);
-    console.log('Score:', score + '%');
 
     // Update attempt with score and completion
     this._attempts.update(attempts => 
@@ -167,7 +148,7 @@ export class ExamsService {
   }
 
     // New method for direct exam submission with answers
-    submitExamAttempt(examId: string, answers: { [questionId: string]: string | number }, score: number): void {
+    submitExamAttempt(examId: string, answers: Record<string, string | number>, score: number): void {
       const currentUser = this.authService.currentUser();
       if (!currentUser) return;
 
@@ -225,23 +206,15 @@ export class ExamsService {
   }
 
   private isAnswerCorrect(question: Question, answer: string | string[] | number): boolean {
-    console.log('Checking answer:', { 
-      questionId: question.id, 
-      questionType: question.type, 
-      userAnswer: answer, 
-      correctAnswer: question.correctAnswer 
-    });
 
     if (question.type === 'multiple-choice') {
       // For multiple choice, correctAnswer is the index (number)
       const userAnswerIndex = typeof answer === 'number' ? answer : parseInt(String(answer));
       const correctIndex = typeof question.correctAnswer === 'number' ? question.correctAnswer : parseInt(String(question.correctAnswer));
       const isCorrect = userAnswerIndex === correctIndex;
-      console.log('Multiple choice result:', { userAnswerIndex, correctIndex, isCorrect });
       return isCorrect;
     } else if (question.type === 'true-false') {
       const isCorrect = String(answer).toLowerCase() === String(question.correctAnswer).toLowerCase();
-      console.log('True/false result:', { userAnswer: answer, correctAnswer: question.correctAnswer, isCorrect });
       return isCorrect;
     } else if (question.type === 'fill-in-blank') {
       const correctAnswers = Array.isArray(question.correctAnswer) 
@@ -250,7 +223,6 @@ export class ExamsService {
       const isCorrect = correctAnswers.some((correct: string | number) => 
         String(correct).toLowerCase().trim() === String(answer).toLowerCase().trim()
       );
-      console.log('Fill-in-blank result:', { userAnswer: answer, correctAnswers, isCorrect });
       return isCorrect;
     }
     return false;
@@ -268,16 +240,16 @@ export class ExamsService {
           this._exams.update(exams => [...exams, ...newExams]);
         }
       }
-    } catch (error) {
-      console.error('Error loading exams from storage:', error);
+    } catch {
+      // Error loading from storage - ignore
     }
   }
 
   private saveToStorage(): void {
     try {
       localStorage.setItem('english-learning-exams', JSON.stringify(this._exams()));
-    } catch (error) {
-      console.error('Error saving exams to storage:', error);
+    } catch {
+      // Error loading from storage - ignore
     }
   }
 
@@ -559,14 +531,12 @@ export class ExamsService {
         createdAt: new Date(),
         updatedAt: new Date()
       };
-      console.log('Adding new exam:', newExam);
       this._exams.update(exams => {
         const updated = [...exams, newExam];
-        console.log('Updated exams list:', updated);
         return updated;
       });
       this.saveToStorage();
-    } catch (error) {
+    } catch {
       this._error.set('Failed to add exam');
     } finally {
       this._isLoading.set(false);
@@ -582,7 +552,7 @@ export class ExamsService {
           exams.map(exam => (exam.id === updatedExam.id ? { ...updatedExam, updatedAt: new Date() } : exam))
         );
         this.saveToStorage();
-    } catch (error) {
+    } catch {
       this._error.set('Failed to update exam');
     } finally {
       this._isLoading.set(false);
@@ -596,7 +566,7 @@ export class ExamsService {
       await this.delay(500);
         this._exams.update(exams => exams.filter(exam => exam.id !== examId));
         this.saveToStorage();
-    } catch (error) {
+    } catch {
       this._error.set('Failed to delete exam');
     } finally {
       this._isLoading.set(false);

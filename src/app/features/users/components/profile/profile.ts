@@ -114,8 +114,8 @@ export class ProfileComponent {
       }
       
       this._isEditMode.set(false);
-    } catch (error) {
-      console.error('Error saving profile:', error);
+    } catch {
+      // Error saving profile - ignore
     } finally {
       this._isSaving.set(false);
     }

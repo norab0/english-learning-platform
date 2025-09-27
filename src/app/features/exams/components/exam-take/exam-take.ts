@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ExamsService } from '../../services/exams';
 import { AuthService } from '../../../auth/services/auth';
-import { Exam, Question, ExamAttempt } from '../../../../core/models/exam.model';
+import { Exam, ExamAttempt } from '../../../../core/models/exam.model';
 
 @Component({
   selector: 'app-exam-take',
@@ -38,7 +38,7 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
 
   // Form
   examForm: FormGroup;
-  private timer: any;
+  private timer: NodeJS.Timeout | null = null;
 
   // Public properties for template
   Math = Math;
@@ -75,22 +75,17 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     this._isLoading.set(true);
     try {
       const examId = this.route.snapshot.paramMap.get('id');
-      console.log('Loading exam with ID:', examId);
       if (examId) {
         const exam = this.examsService.getExamById(examId);
-        console.log('Found exam:', exam);
         if (exam) {
           this._exam.set(exam);
-          console.log('Exam questions:', exam.questions);
           this.initializeForm();
           this.startTimer();
         } else {
-          console.error('Exam not found');
           this.router.navigate(['/exams']);
         }
       }
-    } catch (error) {
-      console.error('Error loading exam:', error);
+    } catch {
       this.router.navigate(['/exams']);
     } finally {
       this._isLoading.set(false);
@@ -102,7 +97,7 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     if (!exam) return;
 
     // Create form controls for each question
-    const formControls: { [key: string]: any } = {};
+    const formControls: Record<string, [string, unknown]> = {};
     exam.questions.forEach((question, index) => {
       formControls[`question_${index}`] = ['', Validators.required];
     });
@@ -114,7 +109,6 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     if (currentUser) {
       this.examsService.startExam(exam.id, currentUser.id).then(attempt => {
         this._attempt.set(attempt);
-        console.log('New attempt created:', attempt);
         
         // Load existing answers if any
         this.loadExistingAnswers(attempt);
@@ -122,16 +116,14 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadExistingAnswers(attempt: any): void {
+  private loadExistingAnswers(attempt: ExamAttempt): void {
     if (attempt && attempt.answers && attempt.answers.length > 0) {
-      console.log('Loading existing answers:', attempt.answers);
-      attempt.answers.forEach((answer: any) => {
+      attempt.answers.forEach((answer) => {
         const questionIndex = this.exam()?.questions.findIndex(q => q.id === answer.questionId);
         if (questionIndex !== undefined && questionIndex >= 0) {
           const formControl = this.examForm.get(`question_${questionIndex}`);
           if (formControl) {
             formControl.setValue(answer.answer);
-            console.log(`Loaded answer for question ${questionIndex}:`, answer.answer);
           }
         }
       });
@@ -186,12 +178,6 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
         processedAnswer = parseInt(answer, 10);
       }
       
-      console.log('Saving answer:', { 
-        questionId: currentQuestion.id, 
-        questionType: currentQuestion.type, 
-        originalAnswer: answer, 
-        processedAnswer 
-      });
       
       this.examsService.submitAnswer(attempt.id, currentQuestion.id, processedAnswer);
     }
@@ -205,20 +191,17 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
       const attempt = this._attempt();
       if (attempt) {
         // Save all answers before submitting
-        console.log('Saving all answers before submission...');
         this.saveAllAnswers();
         
         // Wait a bit to ensure all answers are saved
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        const score = await this.examsService.submitExam(attempt.id);
-        console.log('Exam submitted with score:', score);
+        await this.examsService.submitExam(attempt.id);
         
         // Navigate to results page
         this.router.navigate(['/exams/results', attempt.id]);
       }
-    } catch (error) {
-      console.error('Error submitting exam:', error);
+    } catch {
       alert('Error submitting exam. Please try again.');
     } finally {
       this._isSubmitting.set(false);
@@ -230,7 +213,6 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     const exam = this.exam();
     if (!attempt || !exam) return;
 
-    console.log('Saving all answers...');
     exam.questions.forEach((question, index) => {
       const answer = this.examForm.get(`question_${index}`)?.value;
       if (answer !== null && answer !== undefined && answer !== '') {
@@ -240,7 +222,6 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
           processedAnswer = parseInt(answer, 10);
         }
         
-        console.log(`Saving answer for question ${index + 1} (${question.id}):`, processedAnswer);
         this.examsService.submitAnswer(attempt.id, question.id, processedAnswer);
       }
     });

@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, Input, OnInit, Renderer2, inject } from '@angular/core';
 
 @Directive({
   selector: '[appHighlight]',
@@ -8,10 +8,12 @@ export class HighlightDirective implements OnInit {
   @Input() appHighlight = 'yellow';
   @Input() appHighlightOpacity = 0.3;
 
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2
-  ) {}
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+
+  constructor() {
+    // Services are injected using inject() function
+  }
 
   ngOnInit(): void {
     this.renderer.setStyle(

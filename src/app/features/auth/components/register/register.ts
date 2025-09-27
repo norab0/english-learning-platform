@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,6 +12,12 @@ import { AuthService } from '../../services/auth';
   styleUrl: './register.scss'
 })
 export class RegisterComponent {
+  // Services
+  private fb = inject(FormBuilder);
+  public authService = inject(AuthService);
+  private router = inject(Router);
+
+  // Form
   registerForm: FormGroup;
   private _isSubmitting = signal(false);
 
@@ -19,11 +25,7 @@ export class RegisterComponent {
   public readonly isSubmitting = this._isSubmitting.asReadonly();
   public readonly isFormValid = computed(() => this.registerForm.valid);
 
-  constructor(
-    private fb: FormBuilder,
-    public authService: AuthService,
-    private router: Router
-  ) {
+  constructor() {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
@@ -34,7 +36,7 @@ export class RegisterComponent {
     }, { validators: this.passwordMatchValidator });
   }
 
-  passwordMatchValidator(form: FormGroup) {
+  passwordMatchValidator(form: FormGroup): Record<string, unknown> | null {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
     
@@ -46,9 +48,6 @@ export class RegisterComponent {
   }
 
   async onSubmit(): Promise<void> {
-    console.log('Form valid:', this.registerForm.valid);
-    console.log('Form errors:', this.registerForm.errors);
-    console.log('Form value:', this.registerForm.value);
     
     if (this.registerForm.valid) {
       this._isSubmitting.set(true);
@@ -62,7 +61,6 @@ export class RegisterComponent {
         role: formValue.role
       };
       
-      console.log('Submitting user data:', userData);
       
       const success = await this.authService.register(userData);
       

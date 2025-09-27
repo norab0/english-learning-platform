@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { HighlightDirective } from './highlight';
 
 @Component({
+  standalone: true,
+  imports: [HighlightDirective],
   template: '<div appHighlight="red" appHighlightOpacity="0.5">Test</div>'
 })
 class TestComponent {}
@@ -13,8 +15,7 @@ describe('HighlightDirective', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HighlightDirective],
-      declarations: [TestComponent]
+      imports: [TestComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);

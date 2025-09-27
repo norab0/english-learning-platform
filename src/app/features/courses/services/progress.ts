@@ -1,12 +1,10 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { AuthService } from '../../auth/services/auth';
 
-interface CourseProgressState {
-  [courseId: string]: {
+type CourseProgressState = Record<string, {
     completed: string[];
     lastLessonId?: string;
-  };
-}
+  }>;
 
 @Injectable({ providedIn: 'root' })
 export class ProgressService {
@@ -59,12 +57,16 @@ export class ProgressService {
     try {
       const raw = localStorage.getItem(this.storageKey());
       if (raw) this._progress.set(JSON.parse(raw));
-    } catch {}
+    } catch {
+      // Ignore storage errors
+    }
   }
 
   private saveToStorage(): void {
     try {
       localStorage.setItem(this.storageKey(), JSON.stringify(this._progress()));
-    } catch {}
+    } catch {
+      // Ignore storage errors
+    }
   }
 }

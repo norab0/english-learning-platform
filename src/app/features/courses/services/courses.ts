@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Course, Lesson, CourseProgress } from '../../../core/models/course.model';
+import { Course } from '../../../core/models/course.model';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +40,7 @@ export class CoursesService {
       // Simulate API call
       await this.delay(500);
       // Data is already loaded in constructor
-    } catch (error) {
+    } catch {
       this._error.set('Failed to load courses');
     } finally {
       this._isLoading.set(false);
@@ -63,16 +63,16 @@ export class CoursesService {
           this._courses.update(courses => [...courses, ...newCourses]);
         }
       }
-    } catch (error) {
-      console.error('Error loading courses from storage:', error);
+    } catch {
+      // Error loading from storage - ignore
     }
   }
 
   private saveToStorage(): void {
     try {
       localStorage.setItem('english-learning-courses', JSON.stringify(this._courses()));
-    } catch (error) {
-      console.error('Error saving courses to storage:', error);
+    } catch {
+      // Error loading from storage - ignore
     }
   }
 
@@ -193,7 +193,7 @@ export class CoursesService {
         };
         this._courses.update(courses => [...courses, newCourse]);
         this.saveToStorage();
-      } catch (error) {
+      } catch {
         this._error.set('Failed to add course');
       } finally {
         this._isLoading.set(false);
@@ -209,7 +209,7 @@ export class CoursesService {
           courses.map(course => (course.id === updatedCourse.id ? { ...updatedCourse, updatedAt: new Date() } : course))
         );
         this.saveToStorage();
-      } catch (error) {
+      } catch {
         this._error.set('Failed to update course');
       } finally {
         this._isLoading.set(false);
@@ -222,7 +222,7 @@ export class CoursesService {
       try {
         await this.delay(500);
         this._courses.update(courses => courses.filter(course => course.id !== courseId));
-      } catch (error) {
+      } catch {
         this._error.set('Failed to delete course');
       } finally {
         this._isLoading.set(false);

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CoursesService } from '../../services/courses';
@@ -21,6 +21,11 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
   styleUrl: './course-list.scss'
 })
 export class CourseListComponent implements OnInit {
+  // Services
+  public coursesService = inject(CoursesService);
+  public authService = inject(AuthService);
+
+  // Signals
   private _searchTerm = signal('');
   private _selectedLevel = signal<string>('all');
 
@@ -47,10 +52,9 @@ export class CourseListComponent implements OnInit {
     return courses;
   });
 
-  constructor(
-    public coursesService: CoursesService,
-    public authService: AuthService
-  ) {}
+  constructor() {
+    // Services are injected using inject() function
+  }
 
   async ngOnInit(): Promise<void> {
     await this.coursesService.loadCourses();

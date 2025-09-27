@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,6 +12,12 @@ import { AuthService } from '../../services/auth';
   styleUrl: './login.scss'
 })
 export class LoginComponent {
+  // Services
+  private fb = inject(FormBuilder);
+  public authService = inject(AuthService);
+  private router = inject(Router);
+
+  // Form
   loginForm: FormGroup;
   private _isSubmitting = signal(false);
 
@@ -19,11 +25,7 @@ export class LoginComponent {
   public readonly isSubmitting = this._isSubmitting.asReadonly();
   public readonly isFormValid = computed(() => this.loginForm.valid && !this._isSubmitting());
 
-  constructor(
-    private fb: FormBuilder,
-    public authService: AuthService,
-    private router: Router
-  ) {
+  constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]

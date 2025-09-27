@@ -28,8 +28,7 @@ export class UsersService {
     try {
       // Simulate API call
       await this.delay(500);
-      console.log('Users loaded:', this._users().length);
-    } catch (error) {
+    } catch {
       this._error.set('Failed to load users');
     } finally {
       this._isLoading.set(false);
@@ -80,7 +79,7 @@ export class UsersService {
     return this._users().filter(user => user.role === role);
   }
 
-  getRecentUsers(limit: number = 5): User[] {
+  getRecentUsers(limit = 5): User[] {
     return [...this._users()]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, limit);

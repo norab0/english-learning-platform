@@ -64,7 +64,7 @@ export class ExamManagementComponent {
   }
 
   // Custom validator for questions
-  questionValidator(control: FormGroup) {
+  questionValidator(control: FormGroup): Record<string, unknown> | null {
     const type = control.get('type')?.value;
     const options = control.get('options') as FormArray;
     
@@ -138,8 +138,6 @@ export class ExamManagementComponent {
   }
 
   async saveExam(): Promise<void> {
-    console.log('Exam form valid:', this.examForm.valid);
-    console.log('Exam form value:', this.examForm.value);
     
     // Mark form as touched to show validation errors
     this.examForm.markAllAsTouched();
@@ -149,8 +147,8 @@ export class ExamManagementComponent {
       
       try {
         const formValue = this.examForm.value;
-        const questions: Question[] = formValue.questions.map((q: any, index: number) => {
-          let processedQuestion: Question = {
+        const questions: Question[] = formValue.questions.map((q: { text: string; type: string; points: number; correctAnswer: string; options?: string[] }, index: number) => {
+          const processedQuestion: Question = {
             id: `q${index + 1}`,
             text: q.text,
             type: q.type,
@@ -180,34 +178,29 @@ export class ExamManagementComponent {
           questions: questions
         };
         
-        console.log('Saving exam:', examData);
         
         if (this._editingExam()) {
           // Update existing exam
           const updatedExam: Exam = {
-            ...this._editingExam()!,
+            ...this._editingExam() as Exam,
             ...examData,
             updatedAt: new Date()
           };
           await this.examsService.updateExam(updatedExam);
-          console.log('Exam updated successfully');
           alert('✅ Exam updated successfully!');
         } else {
           // Add new exam
           await this.examsService.addExam(examData);
-          console.log('Exam added successfully');
           alert('✅ Exam created successfully!');
         }
         
         this.resetForm();
-      } catch (error) {
-        console.error('Error saving exam:', error);
+      } catch {
         alert('Error saving exam. Please try again.');
       } finally {
         this._isSubmitting.set(false);
       }
     } else {
-      console.log('Exam form validation failed');
       
       // Get detailed error messages
       const formErrors = this.getFormErrors();
@@ -233,8 +226,8 @@ export class ExamManagementComponent {
     if (confirm('Are you sure you want to delete this exam?')) {
       try {
         await this.examsService.deleteExam(examId);
-      } catch (error) {
-        console.error('Error deleting exam:', error);
+      } catch {
+        // Error deleting exam - ignore
       }
     }
   }
@@ -272,14 +265,14 @@ export class ExamManagementComponent {
   }
 
   // Public getter for courses
-  getCourses() {
+  getCourses(): Course[] {
     return this.courses();
   }
 
   // Question type change handler
-  onQuestionTypeChange(questionIndex: number, event: any): void {
+  onQuestionTypeChange(questionIndex: number, event: Event): void {
     const questionForm = this.questionsArray.at(questionIndex);
-    const questionType = event.target.value;
+    const questionType = (event.target as HTMLSelectElement).value;
     
     // Clear options array
     const optionsArray = questionForm.get('options') as FormArray;
@@ -320,12 +313,12 @@ export class ExamManagementComponent {
   }
 
   // Helper methods for template
-  getQuestionOptions(question: any): any[] {
+  getQuestionOptions(question: AbstractControl): AbstractControl[] {
     const optionsArray = question.get('options') as FormArray;
     return optionsArray ? optionsArray.controls : [];
   }
 
-  getQuestionOptionsLength(question: any): number {
+  getQuestionOptionsLength(question: AbstractControl): number {
     const optionsArray = question.get('options') as FormArray;
     return optionsArray ? optionsArray.length : 0;
   }

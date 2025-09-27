@@ -1,6 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { ExamAttempt } from '../models/exam.model';
-import { User } from '../models/user.model';
 
 export interface UserScore {
   userId: string;
@@ -128,7 +127,7 @@ export class ScoresService {
   }
 
   // Get leaderboard for an exam
-  getExamLeaderboard(examId: string, limit: number = 10): UserScore[] {
+  getExamLeaderboard(examId: string, limit = 10): UserScore[] {
     return this.getExamScores(examId)
       .sort((a, b) => b.percentage - a.percentage)
       .slice(0, limit);
@@ -241,7 +240,7 @@ export class ScoresService {
       },
     ];
 
-    // Pas de scores par défaut - ils seront ajoutés quand les utilisateurs passent vraiment des examens
-    this._scores.set([]);
+    // Initialize with mock scores for demonstration
+    this._scores.set(mockScores);
   }
 }

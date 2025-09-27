@@ -110,10 +110,6 @@ export class CourseManagementComponent {
   }
 
   async saveCourse(): Promise<void> {
-    console.log('Form valid:', this.courseForm.valid);
-    console.log('Lessons form valid:', this.lessonsForm.valid);
-    console.log('Course form value:', this.courseForm.value);
-    console.log('Lessons form value:', this.lessonsForm.value);
     
     // Mark all forms as touched to show validation errors
     this.courseForm.markAllAsTouched();
@@ -124,7 +120,7 @@ export class CourseManagementComponent {
       
       try {
         const courseData = this.courseForm.value;
-        const lessonsData = this.lessonsForm.value.lessons.map((lesson: any, index: number) => ({
+        const lessonsData = this.lessonsForm.value.lessons.map((lesson: { title: string; content: string; duration: number }, index: number) => ({
           id: `${Date.now()}-${index}`,
           title: lesson.title,
           content: lesson.content,
@@ -137,32 +133,27 @@ export class CourseManagementComponent {
           lessons: lessonsData
         };
         
-        console.log('Saving course with lessons:', courseWithLessons);
         
         if (this._editingCourse()) {
           // Update existing course
           const updatedCourse: Course = {
-            ...this._editingCourse()!,
+            ...this._editingCourse() as Course,
             ...courseWithLessons,
             updatedAt: new Date()
           };
           await this.coursesService.updateCourse(updatedCourse);
-          console.log('Course updated successfully');
         } else {
           // Add new course
           await this.coursesService.addCourse(courseWithLessons);
-          console.log('Course added successfully');
         }
         
         this.resetForm();
-      } catch (error) {
-        console.error('Error saving course:', error);
+      } catch {
         alert('Error saving course. Please try again.');
       } finally {
         this._isSubmitting.set(false);
       }
     } else {
-      console.log('Form validation failed');
       if (this.lessonsArray.length === 0) {
         alert('Please add at least one lesson to the course.');
       }
@@ -173,8 +164,8 @@ export class CourseManagementComponent {
     if (confirm('Are you sure you want to delete this course?')) {
       try {
         await this.coursesService.deleteCourse(courseId);
-      } catch (error) {
-        console.error('Error deleting course:', error);
+      } catch {
+        // Error deleting course - ignore
       }
     }
   }
