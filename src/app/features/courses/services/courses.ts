@@ -39,7 +39,8 @@ export class CoursesService {
     try {
       // Simulate API call
       await this.delay(500);
-      // Data is already loaded in constructor
+      // Data is already loaded in constructor, but ensure it's saved to storage
+      this.saveToStorage();
     } catch {
       this._error.set('Failed to load courses');
     } finally {

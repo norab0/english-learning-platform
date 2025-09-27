@@ -71,7 +71,7 @@
                 type="radio"
                 [id]="'option_' + currentQuestionIndex() + '_' + i"
                 [name]="'question_' + currentQuestionIndex()"
-                [value]="i"
+                [value]="i.toString()"
                 formControlName="question_{{ currentQuestionIndex() }}"
                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
               />

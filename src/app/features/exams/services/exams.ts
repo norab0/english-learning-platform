@@ -37,6 +37,7 @@ export class ExamsService {
   constructor() {
     this.loadMockData();
     this.loadFromStorage();
+    this.loadAttemptsFromStorage();
   }
 
   async loadExams(): Promise<void> {
@@ -46,7 +47,8 @@ export class ExamsService {
     try {
       // Simulate API call
       await this.delay(500);
-      // Data is already loaded in constructor
+      // Data is already loaded in constructor, but ensure it's saved to storage
+      this.saveToStorage();
     } catch {
       this._error.set('Failed to load exams');
     } finally {
@@ -81,6 +83,7 @@ export class ExamsService {
   }
 
   async submitAnswer(attemptId: string, questionId: string, answer: string | string[] | number): Promise<void> {
+    console.log('Submitting answer:', { attemptId, questionId, answer });
     
     this._attempts.update(attempts => 
       attempts.map(attempt => {
@@ -94,10 +97,14 @@ export class ExamsService {
             attempt.answers.push(newAnswer);
           }
           
+          console.log('Updated attempt answers:', attempt.answers);
         }
         return attempt;
       })
     );
+    
+    // Save to storage after each answer
+    this.saveAttemptsToStorage();
   }
 
   async submitExam(attemptId: string): Promise<number> {
@@ -111,6 +118,7 @@ export class ExamsService {
       throw new Error('Exam not found');
     }
 
+    console.log('Submitting exam:', { attemptId, examId: attempt.examId, answers: attempt.answers });
 
     // Calculate score
     let correctAnswers = 0;
@@ -121,6 +129,7 @@ export class ExamsService {
       
       if (question) {
         const isCorrect = this.isAnswerCorrect(question, answer.answer);
+        console.log('Question:', question.text, 'Answer:', answer.answer, 'Correct:', isCorrect);
         
         if (isCorrect) {
           correctAnswers++;
@@ -134,6 +143,7 @@ export class ExamsService {
     });
 
     const score = Math.round((correctAnswers / totalQuestions) * 100);
+    console.log('Calculated score:', score, 'Correct answers:', correctAnswers, 'Total questions:', totalQuestions);
 
     // Update attempt with score and completion
     this._attempts.update(attempts => 
@@ -143,6 +153,24 @@ export class ExamsService {
           : a
       )
     );
+
+    // Add score to scores service
+    const currentUser = this.authService.currentUser();
+    if (currentUser && exam) {
+      const updatedAttempt = this._attempts().find(a => a.id === attemptId);
+      if (updatedAttempt) {
+        this.scoresService.addScore(
+          updatedAttempt,
+          exam.title,
+          `${currentUser.firstName} ${currentUser.lastName}`,
+          currentUser.email,
+          exam.passingScore
+        );
+      }
+    }
+
+    // Save to storage
+    this.saveAttemptsToStorage();
 
     return score;
   }
@@ -206,24 +234,36 @@ export class ExamsService {
   }
 
   private isAnswerCorrect(question: Question, answer: string | string[] | number): boolean {
-
+    console.log('Checking answer:', { questionId: question.id, questionType: question.type, userAnswer: answer, correctAnswer: question.correctAnswer });
+    
     if (question.type === 'multiple-choice') {
-      // For multiple choice, correctAnswer is the index (number)
-      const userAnswerIndex = typeof answer === 'number' ? answer : parseInt(String(answer));
-      const correctIndex = typeof question.correctAnswer === 'number' ? question.correctAnswer : parseInt(String(question.correctAnswer));
-      const isCorrect = userAnswerIndex === correctIndex;
-      return isCorrect;
+      // Handle both index-based and text-based correct answers
+      if (typeof question.correctAnswer === 'number') {
+        // Index-based answer (preferred)
+        const userAnswerIndex = typeof answer === 'number' ? answer : parseInt(String(answer));
+        const correctIndex = question.correctAnswer;
+        console.log('Multiple choice (index):', { userAnswerIndex, correctIndex, match: userAnswerIndex === correctIndex });
+        return userAnswerIndex === correctIndex;
+      } else {
+        // Text-based answer (fallback for inconsistent data)
+        const userAnswerText = question.options?.[typeof answer === 'number' ? answer : parseInt(String(answer))];
+        const correctAnswerText = String(question.correctAnswer);
+        console.log('Multiple choice (text):', { userAnswerText, correctAnswerText, match: userAnswerText === correctAnswerText });
+        return userAnswerText === correctAnswerText;
+      }
     } else if (question.type === 'true-false') {
-      const isCorrect = String(answer).toLowerCase() === String(question.correctAnswer).toLowerCase();
-      return isCorrect;
+      const userAnswer = String(answer).toLowerCase();
+      const correctAnswer = String(question.correctAnswer).toLowerCase();
+      console.log('True/False:', { userAnswer, correctAnswer, match: userAnswer === correctAnswer });
+      return userAnswer === correctAnswer;
     } else if (question.type === 'fill-in-blank') {
       const correctAnswers = Array.isArray(question.correctAnswer) 
         ? question.correctAnswer 
         : [question.correctAnswer as string];
-      const isCorrect = correctAnswers.some((correct: string | number) => 
-        String(correct).toLowerCase().trim() === String(answer).toLowerCase().trim()
-      );
-      return isCorrect;
+      const userAnswer = String(answer).toLowerCase().trim();
+      const correctAnswersLower = correctAnswers.map(c => String(c).toLowerCase().trim());
+      console.log('Fill-in-blank:', { userAnswer, correctAnswersLower, match: correctAnswersLower.includes(userAnswer) });
+      return correctAnswersLower.includes(userAnswer);
     }
     return false;
   }
@@ -250,6 +290,32 @@ export class ExamsService {
       localStorage.setItem('english-learning-exams', JSON.stringify(this._exams()));
     } catch {
       // Error loading from storage - ignore
+    }
+  }
+
+  private saveAttemptsToStorage(): void {
+    try {
+      localStorage.setItem('english-learning-attempts', JSON.stringify(this._attempts()));
+    } catch {
+      // Error saving attempts - ignore
+    }
+  }
+
+  private loadAttemptsFromStorage(): void {
+    try {
+      const storedAttempts = localStorage.getItem('english-learning-attempts');
+      if (storedAttempts) {
+        const parsedAttempts = JSON.parse(storedAttempts);
+        // Convert date strings back to Date objects
+        const attemptsWithDates = parsedAttempts.map((attempt: any) => ({
+          ...attempt,
+          startedAt: new Date(attempt.startedAt),
+          completedAt: attempt.completedAt ? new Date(attempt.completedAt) : undefined
+        }));
+        this._attempts.set(attemptsWithDates);
+      }
+    } catch {
+      // Error loading attempts - ignore
     }
   }
 
@@ -368,7 +434,7 @@ export class ExamsService {
               'If I would know, I would come',
               'If I know, I would come'
             ],
-            correctAnswer: 'If I had known, I would have come',
+            correctAnswer: 1, // Index de 'If I had known, I would have come' dans le tableau
             points: 20
           },
           {
@@ -376,7 +442,7 @@ export class ExamsService {
             text: 'What is the correct form: "The book ___ I read yesterday was interesting."',
             type: 'multiple-choice',
             options: ['which', 'who', 'whom', 'whose'],
-            correctAnswer: 'which',
+            correctAnswer: 0, // Index de 'which' dans le tableau
             points: 20
           },
           {
@@ -396,7 +462,7 @@ export class ExamsService {
               'The letter was writing by John',
               'The letter written by John'
             ],
-            correctAnswer: 'The letter was written by John',
+            correctAnswer: 0, // Index de 'The letter was written by John' dans le tableau
             points: 20
           }
         ],
@@ -422,7 +488,7 @@ export class ExamsService {
               'A type of meeting',
               'A business strategy'
             ],
-            correctAnswer: 'The final date for completing something',
+            correctAnswer: 1, // Index de 'The final date for completing something' dans le tableau
             points: 20
           },
           {
@@ -435,7 +501,7 @@ export class ExamsService {
               'Yo, check this out',
               'Sup dude'
             ],
-            correctAnswer: 'Dear Sir/Madam',
+            correctAnswer: 1, // Index de 'Dear Sir/Madam' dans le tableau
             points: 20
           },
           {
@@ -448,7 +514,7 @@ export class ExamsService {
               'To copy someone',
               'To finish something'
             ],
-            correctAnswer: 'To continue or check on something later',
+            correctAnswer: 1, // Index de 'To continue or check on something later' dans le tableau
             points: 20
           },
           {
@@ -476,7 +542,7 @@ export class ExamsService {
             text: 'What is the opposite of "ancient"?',
             type: 'multiple-choice',
             options: ['old', 'modern', 'historic', 'traditional'],
-            correctAnswer: 'modern',
+            correctAnswer: 1, // Index de 'modern' dans le tableau
             points: 15
           },
           {
@@ -484,7 +550,7 @@ export class ExamsService {
             text: 'What does "enormous" mean?',
             type: 'multiple-choice',
             options: ['very small', 'very large', 'very fast', 'very slow'],
-            correctAnswer: 'very large',
+            correctAnswer: 1, // Index de 'very large' dans le tableau
             points: 15
           },
           {
@@ -492,7 +558,7 @@ export class ExamsService {
             text: 'Which word means "to make something better"?',
             type: 'multiple-choice',
             options: ['improve', 'worsen', 'destroy', 'ignore'],
-            correctAnswer: 'improve',
+            correctAnswer: 0, // Index de 'improve' dans le tableau
             points: 15
           },
           {
@@ -500,7 +566,7 @@ export class ExamsService {
             text: 'What is a synonym for "beautiful"?',
             type: 'multiple-choice',
             options: ['ugly', 'pretty', 'strange', 'boring'],
-            correctAnswer: 'pretty',
+            correctAnswer: 1, // Index de 'pretty' dans le tableau
             points: 15
           },
           {

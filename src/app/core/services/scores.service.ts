@@ -54,6 +54,7 @@ export class ScoresService {
 
   constructor() {
     this.loadMockScores();
+    this.loadFromStorage();
   }
 
   // Get scores for a specific user
@@ -108,7 +109,7 @@ export class ScoresService {
   }
 
   // Add a new score
-  addScore(attempt: ExamAttempt, examTitle: string, userName: string, userEmail: string): void {
+  addScore(attempt: ExamAttempt, examTitle: string, userName: string, userEmail: string, passingScore: number = 70): void {
     const userScore: UserScore = {
       userId: attempt.userId,
       userName,
@@ -118,12 +119,16 @@ export class ScoresService {
       score: attempt.score || 0,
       maxScore: 100,
       percentage: attempt.score || 0,
-      passed: (attempt.score || 0) >= 70,
+      passed: (attempt.score || 0) >= passingScore,
       completedAt: attempt.completedAt || new Date(),
       attempts: 1 // This would be calculated based on previous attempts
     };
 
-    this._scores.update(scores => [...scores, userScore]);
+    this._scores.update(scores => {
+      const newScores = [...scores, userScore];
+      this.saveToStorage();
+      return newScores;
+    });
   }
 
   // Get leaderboard for an exam
@@ -242,5 +247,33 @@ export class ScoresService {
 
     // Initialize with mock scores for demonstration
     this._scores.set(mockScores);
+  }
+
+  private loadFromStorage(): void {
+    try {
+      const storedScores = localStorage.getItem('english-learning-scores');
+      if (storedScores) {
+        const parsedScores = JSON.parse(storedScores);
+        // Merge with existing mock data, avoiding duplicates
+        const existingIds = this._scores().map(score => `${score.userId}-${score.examId}-${score.completedAt.getTime()}`);
+        const newScores = parsedScores.filter((score: UserScore) => {
+          const scoreId = `${score.userId}-${score.examId}-${new Date(score.completedAt).getTime()}`;
+          return !existingIds.includes(scoreId);
+        });
+        if (newScores.length > 0) {
+          this._scores.update(scores => [...scores, ...newScores]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading scores from storage:', error);
+    }
+  }
+
+  private saveToStorage(): void {
+    try {
+      localStorage.setItem('english-learning-scores', JSON.stringify(this._scores()));
+    } catch (error) {
+      console.error('Error saving scores to storage:', error);
+    }
   }
 }

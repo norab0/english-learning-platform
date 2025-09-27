@@ -72,4 +72,22 @@ export class ExamListComponent implements OnInit {
     if (percentage >= 70) return 'bg-yellow-100 text-yellow-800';
     return 'bg-red-100 text-red-800';
   }
+
+  // View exam details
+  viewExamDetails(examId: string): void {
+    // For now, we'll just show an alert with exam details
+    // In a real app, this could open a modal or navigate to a details page
+    const exam = this.examsService.getExamById(examId);
+    if (exam) {
+      const details = `
+        Title: ${exam.title}
+        Description: ${exam.description}
+        Duration: ${this.getDurationText(exam.duration)}
+        Questions: ${exam.questions.length}
+        Passing Score: ${exam.passingScore}%
+        Level: ${exam.courseId === '1' ? 'Beginner' : exam.courseId === '2' ? 'Intermediate' : 'Advanced'}
+      `;
+      alert(details);
+    }
+  }
 }

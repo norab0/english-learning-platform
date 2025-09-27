@@ -178,7 +178,6 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
         processedAnswer = parseInt(answer, 10);
       }
       
-      
       this.examsService.submitAnswer(attempt.id, currentQuestion.id, processedAnswer);
     }
   }
@@ -191,10 +190,7 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
       const attempt = this._attempt();
       if (attempt) {
         // Save all answers before submitting
-        this.saveAllAnswers();
-        
-        // Wait a bit to ensure all answers are saved
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await this.saveAllAnswers();
         
         await this.examsService.submitExam(attempt.id);
         
@@ -208,13 +204,17 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
     }
   }
 
-  private saveAllAnswers(): void {
+  private async saveAllAnswers(): Promise<void> {
     const attempt = this._attempt();
     const exam = this.exam();
     if (!attempt || !exam) return;
 
+    console.log('Saving all answers for attempt:', attempt.id);
+
+    // Save all answers directly to the attempt
     exam.questions.forEach((question, index) => {
       const answer = this.examForm.get(`question_${index}`)?.value;
+      
       if (answer !== null && answer !== undefined && answer !== '') {
         // Convert string numbers to actual numbers for multiple choice questions
         let processedAnswer = answer;
@@ -222,9 +222,21 @@ export class ExamTakeComponent implements OnInit, OnDestroy {
           processedAnswer = parseInt(answer, 10);
         }
         
-        this.examsService.submitAnswer(attempt.id, question.id, processedAnswer);
+        console.log('Saving answer for question:', question.id, 'Answer:', processedAnswer);
+        
+        // Update or add answer to attempt
+        const existingAnswerIndex = attempt.answers.findIndex(a => a.questionId === question.id);
+        const newAnswer = { questionId: question.id, answer: processedAnswer };
+        
+        if (existingAnswerIndex >= 0) {
+          attempt.answers[existingAnswerIndex] = newAnswer;
+        } else {
+          attempt.answers.push(newAnswer);
+        }
       }
     });
+
+    console.log('Final answers before submission:', attempt.answers);
   }
 
   formatTime(seconds: number): string {
