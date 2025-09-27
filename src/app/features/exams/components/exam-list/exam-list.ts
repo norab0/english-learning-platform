@@ -26,6 +26,8 @@ export class ExamListComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.examsService.loadExams();
+    // Force reload scores from storage
+    this.scoresService.loadFromStorage();
   }
 
   getDifficultyColor(difficulty: string): string {

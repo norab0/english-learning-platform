@@ -107,6 +107,21 @@
         </div>
       </div>
 
+      <!-- Debug Section (temporary) -->
+      <div class="card bg-yellow-50 border-yellow-200">
+        <h3 class="text-lg font-semibold text-yellow-800 mb-4">Debug Tools</h3>
+        <div class="flex space-x-3">
+          <button (click)="resetProgressData()" 
+                  class="bg-red-600 text-white px-4 py-2 rounded text-sm">
+            Reset Progress Data
+          </button>
+          <button (click)="initializeTestData()" 
+                  class="bg-green-600 text-white px-4 py-2 rounded text-sm">
+            Initialize Test Data
+          </button>
+        </div>
+      </div>
+
       <!-- Course Progress List -->
       <div class="card">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Course Progress</h3>

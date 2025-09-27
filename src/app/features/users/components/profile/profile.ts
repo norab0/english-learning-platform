@@ -39,12 +39,19 @@ export class ProfileComponent {
     const user = this.currentUser();
     if (!user) return [];
     
-    return this.coursesService.courses().map(course => ({
-      course,
-      progress: this.progressService.getCourseProgressPercent(course.id, course.lessons.length),
-      completedLessons: this.progressService.progress()[course.id]?.completed?.length || 0,
-      totalLessons: course.lessons.length
-    }));
+    const progress = this.coursesService.courses().map(course => {
+      const courseProgress = {
+        course,
+        progress: this.progressService.getCourseProgressPercent(course.id, course.lessons.length),
+        completedLessons: this.progressService.progress()[course.id]?.completed?.length || 0,
+        totalLessons: course.lessons.length
+      };
+      console.log('Course progress for', course.title, ':', courseProgress);
+      return courseProgress;
+    });
+    
+    console.log('All course progress:', progress);
+    return progress;
   });
 
   // Calculate total courses completed
@@ -60,6 +67,15 @@ export class ProfileComponent {
     const totalProgress = progress.reduce((sum, p) => sum + p.progress, 0);
     return Math.round(totalProgress / progress.length);
   });
+
+  // Debug methods
+  resetProgressData(): void {
+    this.progressService.resetProgressData();
+  }
+
+  initializeTestData(): void {
+    this.progressService.initializeTestData();
+  }
 
   // Form validation
   isFormValid = computed(() => {

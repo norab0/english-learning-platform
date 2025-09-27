@@ -53,8 +53,11 @@ export class ScoresService {
   });
 
   constructor() {
-    this.loadMockScores();
     this.loadFromStorage();
+    // Only load mock data if no data exists in storage
+    if (this._scores().length === 0) {
+      this.loadMockScores();
+    }
   }
 
   // Get scores for a specific user
@@ -69,13 +72,21 @@ export class ScoresService {
 
   // Get user's best score for an exam
   getUserBestScore(userId: string, examId: string): UserScore | null {
-    const userExamScores = this._scores().filter(
+    const allScores = this._scores();
+    console.log('All scores:', allScores);
+    console.log('Looking for userId:', userId, 'examId:', examId);
+    
+    const userExamScores = allScores.filter(
       score => score.userId === userId && score.examId === examId
     );
+    console.log('User exam scores:', userExamScores);
+    
     if (userExamScores.length === 0) return null;
-    return userExamScores.reduce((best, current) => 
+    const bestScore = userExamScores.reduce((best, current) => 
       current.percentage > best.percentage ? current : best
     );
+    console.log('Best score found:', bestScore);
+    return bestScore;
   }
 
   // Get exam statistics
@@ -124,11 +135,34 @@ export class ScoresService {
       attempts: 1 // This would be calculated based on previous attempts
     };
 
+    console.log('Adding score to ScoresService:', userScore);
+
     this._scores.update(scores => {
-      const newScores = [...scores, userScore];
-      this.saveToStorage();
-      return newScores;
+      // Check if this score already exists (same userId, examId, and completedAt)
+      const existingScore = scores.find(s => 
+        s.userId === userScore.userId && 
+        s.examId === userScore.examId && 
+        s.completedAt.getTime() === userScore.completedAt.getTime()
+      );
+      
+      if (existingScore) {
+        console.log('Score already exists, updating instead of adding:', existingScore);
+        // Update existing score
+        return scores.map(s => 
+          s.userId === userScore.userId && 
+          s.examId === userScore.examId && 
+          s.completedAt.getTime() === userScore.completedAt.getTime()
+            ? userScore 
+            : s
+        );
+      } else {
+        console.log('Adding new score');
+        return [...scores, userScore];
+      }
     });
+
+    // Save to storage after updating the signal
+    this.saveToStorage();
   }
 
   // Get leaderboard for an exam
@@ -249,20 +283,18 @@ export class ScoresService {
     this._scores.set(mockScores);
   }
 
-  private loadFromStorage(): void {
+  loadFromStorage(): void {
     try {
       const storedScores = localStorage.getItem('english-learning-scores');
       if (storedScores) {
         const parsedScores = JSON.parse(storedScores);
-        // Merge with existing mock data, avoiding duplicates
-        const existingIds = this._scores().map(score => `${score.userId}-${score.examId}-${score.completedAt.getTime()}`);
-        const newScores = parsedScores.filter((score: UserScore) => {
-          const scoreId = `${score.userId}-${score.examId}-${new Date(score.completedAt).getTime()}`;
-          return !existingIds.includes(scoreId);
-        });
-        if (newScores.length > 0) {
-          this._scores.update(scores => [...scores, ...newScores]);
-        }
+        // Convert date strings back to Date objects
+        const scoresWithDates = parsedScores.map((score: any) => ({
+          ...score,
+          completedAt: new Date(score.completedAt)
+        }));
+        this._scores.set(scoresWithDates);
+        console.log('Loaded scores from storage:', scoresWithDates);
       }
     } catch (error) {
       console.error('Error loading scores from storage:', error);
@@ -271,7 +303,10 @@ export class ScoresService {
 
   private saveToStorage(): void {
     try {
-      localStorage.setItem('english-learning-scores', JSON.stringify(this._scores()));
+      const scores = this._scores();
+      console.log('Saving scores to storage:', scores);
+      localStorage.setItem('english-learning-scores', JSON.stringify(scores));
+      console.log('Scores saved successfully to localStorage');
     } catch (error) {
       console.error('Error saving scores to storage:', error);
     }
