@@ -43,7 +43,9 @@ export class AuthService {
       // Simulate API call
       await this.delay(1000);
       
-      // Mock authentication
+      console.log('Attempting login with:', credentials.email);
+      
+      // Check hardcoded admin account first
       if (credentials.email === 'admin@test.com' && credentials.password === 'admin123') {
         const user: User = {
           id: '1',
@@ -56,8 +58,12 @@ export class AuthService {
           lastLogin: new Date()
         };
         this._currentUser.set(user);
+        console.log('Admin login successful');
         return true;
-      } else if (credentials.email === 'user@test.com' && credentials.password === 'user123') {
+      }
+      
+      // Check hardcoded user account
+      if (credentials.email === 'user@test.com' && credentials.password === 'user123') {
         const user: User = {
           id: '2',
           email: credentials.email,
@@ -69,12 +75,33 @@ export class AuthService {
           lastLogin: new Date()
         };
         this._currentUser.set(user);
+        console.log('User login successful');
         return true;
-      } else {
-        this._error.set('Invalid credentials');
-        return false;
       }
-    } catch {
+      
+      // Check registered users
+      const registeredUsers = this.getStoredUsers();
+      console.log('Registered users:', registeredUsers);
+      
+      const user = registeredUsers.find(u => u.email === credentials.email);
+      if (user) {
+        // For demo purposes, we'll accept any password for registered users
+        // In a real app, you'd verify the password hash
+        const updatedUser = {
+          ...user,
+          token: this.generateToken(),
+          lastLogin: new Date()
+        };
+        this._currentUser.set(updatedUser);
+        console.log('Registered user login successful:', updatedUser);
+        return true;
+      }
+      
+      console.log('No user found with email:', credentials.email);
+      this._error.set('Invalid credentials');
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
       this._error.set('Login failed. Please try again.');
       return false;
     } finally {
@@ -90,9 +117,14 @@ export class AuthService {
       // Simulate API call
       await this.delay(1000);
       
+      console.log('Attempting registration with:', userData.email);
+      
       // Check if email already exists
       const existingUsers = this.getStoredUsers();
+      console.log('Existing users:', existingUsers);
+      
       if (existingUsers.some(u => u.email === userData.email)) {
+        console.log('Email already exists:', userData.email);
         this._error.set('Email already exists. Please use a different email.');
         return false;
       }
@@ -109,11 +141,16 @@ export class AuthService {
         lastLogin: new Date()
       };
       
+      console.log('Creating new user:', user);
+      
       // Store user in localStorage
       this.storeUser(user);
       this._currentUser.set(user);
+      
+      console.log('Registration successful, user stored and logged in');
       return true;
-    } catch {
+    } catch (error) {
+      console.error('Registration error:', error);
       this._error.set('Registration failed. Please try again.');
       return false;
     } finally {
@@ -165,13 +202,17 @@ export class AuthService {
 
   private getStoredUsers(): User[] {
     const stored = localStorage.getItem('registeredUsers');
-    return stored ? JSON.parse(stored) : [];
+    const users = stored ? JSON.parse(stored) : [];
+    console.log('Retrieved stored users:', users);
+    return users;
   }
 
   private storeUser(user: User): void {
     const users = this.getStoredUsers();
     users.push(user);
+    console.log('Storing users:', users);
     localStorage.setItem('registeredUsers', JSON.stringify(users));
+    console.log('Users stored successfully in localStorage');
   }
 
   private delay(ms: number): Promise<void> {
